@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mehfil — Waitlist Landing Page · Implementation Doc</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+  :root{
+    --bg:#0a0710; --bg2:#120a1c; --card:#170f24; --line:#2a1d3d;
+    --ink:#f3ecff; --mut:#a99dc4; --acc:#ff3d8b; --acc2:#9b5cff; --grn:#1db954;
+    --code:#0d0a15;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:radial-gradient(1200px 600px at 80% -10%,rgba(155,92,255,.18),transparent 60%),radial-gradient(900px 500px at 0% 10%,rgba(255,61,139,.14),transparent 55%),var(--bg);
+    color:var(--ink); font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:0 22px}
+  header.hero{padding:64px 0 34px; border-bottom:1px solid var(--line)}
+  .badge{display:inline-block; font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--acc); border:1px solid var(--line); padding:5px 12px; border-radius:999px; background:rgba(255,61,139,.06)}
+  h1{font-size:clamp(30px,5vw,46px); line-height:1.08; margin:18px 0 8px; letter-spacing:-.02em}
+  h1 .g{background:linear-gradient(90deg,var(--acc),var(--acc2)); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .sub{color:var(--mut); font-size:18px; max-width:680px}
+  h2{font-size:26px; margin:52px 0 6px; letter-spacing:-.01em; scroll-margin-top:20px}
+  h2 .n{color:var(--acc2); font-variant-numeric:tabular-nums; margin-right:10px}
+  h3{font-size:18px; margin:30px 0 4px; color:#e9def9}
+  p{color:#d8cfe9}
+  a{color:var(--acc)}
+  .mut{color:var(--mut)}
+  .lead{font-size:17px}
+  ul{padding-left:20px} li{margin:6px 0; color:#d8cfe9}
+  code:not(pre code){background:#221634; color:#ffd6e7; padding:2px 6px; border-radius:6px; font-size:.86em; font-family:"SF Mono",ui-monospace,Menlo,monospace}
+  pre{background:var(--code); border:1px solid var(--line); border-radius:14px; padding:0; overflow:auto; margin:16px 0; box-shadow:0 18px 40px -24px rgba(0,0,0,.8)}
+  pre .cap{display:flex; align-items:center; gap:8px; padding:9px 14px; border-bottom:1px solid var(--line); font:600 12px/1 ui-monospace,monospace; color:var(--mut); letter-spacing:.04em}
+  pre .cap .dot{width:10px;height:10px;border-radius:50%;background:#ff5f56;box-shadow:18px 0 #ffbd2e,36px 0 #27c93f}
+  pre .cap .fn{margin-left:14px}
+  pre code{display:block; padding:16px 18px; font:13px/1.6 "SF Mono",ui-monospace,Menlo,monospace; background:transparent}
+  .grid{display:grid; gap:14px; grid-template-columns:1fr 1fr; margin:18px 0}
+  @media(max-width:680px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 18px}
+  .card h4{margin:0 0 6px; font-size:15px; color:#fff}
+  .card p{margin:0; font-size:14px; color:var(--mut)}
+  .pill{display:inline-block; font-size:12px; padding:3px 9px; border-radius:999px; border:1px solid var(--line); color:var(--mut); margin:0 6px 6px 0}
+  .pill.ok{color:#74e39a; border-color:#1f4d33; background:rgba(29,185,84,.08)}
+  .pill.no{color:#ff8aa6; border-color:#4d1f30; background:rgba(255,61,139,.07)}
+  .flow{counter-reset:s; margin:14px 0}
+  .flow .step{position:relative; padding:14px 16px 14px 56px; border:1px solid var(--line); border-radius:14px; background:var(--card); margin:10px 0}
+  .flow .step:before{counter-increment:s; content:counter(s); position:absolute; left:14px; top:14px; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-weight:700; font-size:14px; color:#fff; background:linear-gradient(135deg,var(--acc),var(--acc2))}
+  .flow .step b{color:#fff}
+  table{width:100%; border-collapse:collapse; margin:16px 0; font-size:14px}
+  th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line)}
+  th{color:var(--mut); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.06em}
+  td code{font-size:12px}
+  .toc{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 20px; margin:26px 0}
+  .toc a{display:inline-block; color:var(--mut); text-decoration:none; margin:4px 14px 4px 0; font-size:14px}
+  .toc a:hover{color:var(--acc)}
+  .note{border-left:3px solid var(--acc); background:rgba(255,61,139,.06); padding:12px 16px; border-radius:0 10px 10px 0; margin:16px 0; font-size:14px; color:#e6d9f2}
+  footer{margin:60px 0 40px; padding-top:20px; border-top:1px solid var(--line); color:var(--mut); font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <span class="badge">Implementation Doc · v1</span>
+  <h1>Mehfil <span class="g">Waitlist</span><br>One-page hero, Spotify-powered, WhatsApp-viral</h1>
+  <p class="sub">A single hero section that turns a music-app login into a shareable "song for the Mehfil" card and a skip-the-line referral loop — engineered to be dropped as a party poll into WhatsApp groups.</p>
+</header>
+
+<div class="toc">
+  <strong style="display:block;margin-bottom:6px;font-size:13px;color:var(--ink)">Contents</strong>
+  <a href="#concept">1 · Concept</a>
+  <a href="#journey">2 · User journey</a>
+  <a href="#arch">3 · Architecture</a>
+  <a href="#spotify">4 · Spotify data</a>
+  <a href="#auth">5 · Auth (OAuth PKCE)</a>
+  <a href="#map">6 · Archetype + song map</a>
+  <a href="#player">7 · The dashboard player</a>
+  <a href="#poll">8 · WhatsApp poll share</a>
+  <a href="#waitlist">9 · Referral waitlist</a>
+  <a href="#v1">10 · v1 vs v2</a>
+</div>
+
+<h2 id="concept"><span class="n">01</span>Concept</h2>
+<p class="lead">No email form. The signup <em>is</em> the music connect. One tap reads the user's vibe, brands them a "song for the Mehfil," gives them a waitlist position, and arms a WhatsApp poll that drops their friends straight into the same line — jumping them up it.</p>
+<div class="grid">
+  <div class="card"><h4>🎯 The hook</h4><p>"This is your song for the Mehfil" — a personalized, branded music card people <em>want</em> to post.</p></div>
+  <div class="card"><h4>🔥 The FOMO</h4><p>Live city counter + a high waitlist number that stings → motivates the share.</p></div>
+  <div class="card"><h4>🪜 The engine</h4><p>Skip-the-line: every friend who joins via your link jumps you up the queue.</p></div>
+  <div class="card"><h4>💬 The loop</h4><p>Share = a WhatsApp <em>party poll</em>. "Who's IN?" — the group sees who's out.</p></div>
+</div>
+
+<h2 id="journey"><span class="n">02</span>User journey</h2>
+<div class="flow">
+  <div class="step"><b>Land.</b> Hero loads with a live counter — <span class="mut">"4,212 already in line in your city. Your friends are inside."</span> No form. Three buttons: Connect Spotify · YouTube Music · Email.</div>
+  <div class="step"><b>Connect = sign up.</b> One OAuth tap is identity <em>and</em> vibe data. Loader: <span class="mut">"Reading your vibe…"</span></div>
+  <div class="step"><b>Dashboard reveal.</b> Their Mehfil card: archetype + genres + <b>"🔥 This is your song for the Mehfil"</b> with the track playing in an embedded Spotify player.</div>
+  <div class="step"><b>Position sting.</b> <span class="mut">"You're #4,213."</span> Far back on purpose — that tension drives step 5.</div>
+  <div class="step"><b>Drop the party poll.</b> CTA opens WhatsApp pre-filled with a poll-style message that includes their song + referral link.</div>
+  <div class="step"><b>Watch it climb.</b> Each friend who joins via the link moves their position bar up live. Group leaderboard: you vs. your friends.</div>
+</div>
+
+<h2 id="arch"><span class="n">03</span>Architecture</h2>
+<p>Static front-end + one tiny backend for the only two things that truly need a server: the referral ledger and the OAuth token exchange.</p>
+<pre><span class="cap"><span class="dot"></span><span class="fn">architecture.txt</span></span><code>Browser (static hero)                Backend (serverless fn + DB)
+┌───────────────────────────┐        ┌──────────────────────────────┐
+│  index.html               │        │  POST /auth/spotify          │ ← PKCE token swap
+│   • connect buttons       │ ─────▶ │  GET  /me/top  (proxied)     │ ← reads top artists
+│   • archetype + song card │        │  POST /waitlist/join         │ ← creates row, returns #
+│   • Spotify embed iframe  │ ─────▶ │  GET  /waitlist/position?ref │ ← live position
+│   • wa.me poll share      │        │  POST /referral/credit       │ ← +N on valid join
+└───────────────────────────┘        └──────────────┬───────────────┘
+        localStorage(ref, pos)                       │
+                                          Postgres / Supabase / KV
+                                          waitlist(id, ref_code, referred_by,
+                                                   archetype, track_id, joined_at)</code></pre>
+<div class="grid">
+  <div class="card"><h4>Front-end</h4><p>Plain HTML/CSS/JS or Next.js. Spotify <code>iframe</code> embed for playback — zero audio hosting.</p></div>
+  <div class="card"><h4>Backend</h4><p>Vercel/Cloudflare function + Supabase (Postgres) or Upstash KV. ~3 endpoints.</p></div>
+  <div class="card"><h4>Why a backend at all</h4><p>Referral counts must be server-authoritative (can't trust the client), and the Spotify client secret can't ship to the browser.</p></div>
+  <div class="card"><h4>v1 shortcut</h4><p>Skip the backend entirely — fake the counter + position in JS to ship the teaser today.</p></div>
+</div>
+
+<h2 id="spotify"><span class="n">04</span>What Spotify data we fetch</h2>
+<p>Spotify cut several endpoints for new apps in Nov 2024 (recommendations, audio-features, related-artists). The <em>personal-data</em> endpoints we rely on are untouched.</p>
+<table>
+  <thead><tr><th>Data</th><th>Endpoint / scope</th><th>Use</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>Top artists</td><td><code>/me/top/artists</code> · <code>user-top-read</code></td><td>Headline of the card</td><td><span class="pill ok">live</span></td></tr>
+    <tr><td>Top tracks</td><td><code>/me/top/tracks</code></td><td>"Your anthem" / the song</td><td><span class="pill ok">live</span></td></tr>
+    <tr><td>Genres</td><td>from artist object</td><td>→ drinker archetype</td><td><span class="pill ok">live</span></td></tr>
+    <tr><td>Profile</td><td><code>/me</code></td><td>Name + avatar on card</td><td><span class="pill ok">live</span></td></tr>
+    <tr><td>Recently played</td><td><code>/me/player/recently-played</code></td><td>"Last night you blasted…"</td><td><span class="pill ok">live</span></td></tr>
+    <tr><td>Energy/danceability</td><td><code>/audio-features</code></td><td>—</td><td><span class="pill no">deprecated</span></td></tr>
+    <tr><td>Recommendations</td><td><code>/recommendations</code></td><td>—</td><td><span class="pill no">deprecated</span></td></tr>
+  </tbody>
+</table>
+<div class="note"><b>Quota gotcha:</b> a fresh Spotify app is in <em>Development Mode</em> — capped at 25 manually-added users. Public launch needs an <b>extension request</b> (review takes days). Plan for it before you promise real Spotify to a crowd. <b>YouTube Music</b> has no public "top artists" API, so that button is Google sign-in for identity only — no vibe data.</div>
+
+<h2 id="auth"><span class="n">05</span>Auth — Spotify OAuth (PKCE)</h2>
+<p>PKCE is the right flow for a public client. Step 1 redirects to Spotify; step 2 swaps the code for a token (secret stays server-side).</p>
+<pre><span class="cap"><span class="dot"></span><span class="fn">auth.js — kick off PKCE login</span></span><code class="language-javascript">const CLIENT_ID = "YOUR_SPOTIFY_CLIENT_ID";
+const REDIRECT  = location.origin + "/callback";
+const SCOPES    = "user-top-read user-read-recently-played";
+
+function base64url(buf){
+  return btoa(String.fromCharCode(...new Uint8Array(buf)))
+    .replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+async function loginWithSpotify(){
+  // 1. create + stash the PKCE verifier
+  const verifier = base64url(crypto.getRandomValues(new Uint8Array(64)));
+  const challenge = base64url(await crypto.subtle.digest(
+    "SHA-256", new TextEncoder().encode(verifier)));
+  sessionStorage.setItem("pkce_verifier", verifier);
+
+  // 2. bounce the user to Spotify's consent screen
+  const url = new URL("https://accounts.spotify.com/authorize");
+  url.search = new URLSearchParams({
+    client_id: CLIENT_ID, response_type: "code", redirect_uri: REDIRECT,
+    scope: SCOPES, code_challenge_method: "S256", code_challenge: challenge,
+  });
+  location.href = url.toString();
+}</code></pre>
+<pre><span class="cap"><span class="dot"></span><span class="fn">api/auth/spotify.js — token swap (serverless)</span></span><code class="language-javascript">// POST { code, verifier } -> { access_token }
+export default async function handler(req, res){
+  const { code, verifier } = req.body;
+  const body = new URLSearchParams({
+    grant_type: "authorization_code",
+    code, redirect_uri: process.env.REDIRECT_URI,
+    client_id: process.env.SPOTIFY_CLIENT_ID,
+    code_verifier: verifier,
+  });
+  const r = await fetch("https://accounts.spotify.com/api/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body,
+  });
+  const tok = await r.json();          // { access_token, expires_in, ... }
+  res.json({ access_token: tok.access_token });
+}</code></pre>
+<pre><span class="cap"><span class="dot"></span><span class="fn">vibe.js — read top track + genres</span></span><code class="language-javascript">async function readVibe(token){
+  const h = { headers: { Authorization: `Bearer ${token}` } };
+  const [tracks, artists] = await Promise.all([
+    fetch("https://api.spotify.com/v1/me/top/tracks?limit=5&time_range=short_term", h).then(r=>r.json()),
+    fetch("https://api.spotify.com/v1/me/top/artists?limit=10&time_range=short_term", h).then(r=>r.json()),
+  ]);
+  const topTrack = tracks.items[0];                  // the "song for the Mehfil"
+  const genres = [...new Set(artists.items.flatMap(a => a.genres))];
+  return {
+    trackId:  topTrack.id,
+    trackName: topTrack.name,
+    artist:   topTrack.artists[0].name,
+    genres,
+    archetype: pickArchetype(genres),                // see §6
+  };
+}</code></pre>
+
+<h2 id="map"><span class="n">06</span>Genre → archetype → song map</h2>
+<p>This is the viral asset: a label that begs comparison ("which drinker are you?"). Each archetype carries a branded fallback song (verified live Spotify track IDs) — used directly in v1, or as a fallback when the user has no clear top track.</p>
+<pre><span class="cap"><span class="dot"></span><span class="fn">archetypes.js</span></span><code class="language-javascript">export const ARCHETYPES = [
+  { id:"aux",   name:"The Aux Cord King 👑",   match:["punjabi","desi hip hop","hip hop","rap"],
+    track:{ id:"58f4twRnbZOOVUhMUpplJ4", name:"Brown Munde",  artist:"AP Dhillon" } },
+  { id:"floor", name:"The Floor Filler 🕺",     match:["bollywood","filmi","dance","desi pop"],
+    track:{ id:"1oBLwCymyED4c1KrvkT2HB", name:"Kala Chashma", artist:"Badshah" } },
+  { id:"last",  name:"The Last One Standing 🔊", match:["edm","techno","house","electro"],
+    track:{ id:"6Xe9wT5xeZETPwtaP2ynUz", name:"Levels",       artist:"Avicii" } },
+  { id:"wine",  name:"The Slow Wine 🍷",        match:["afrobeats","amapiano","r&b","afropop"],
+    track:{ id:"0VT0pD48jzdje9AktC2Vgv", name:"Calm Down",    artist:"Rema" } },
+  { id:"poet",  name:"The 2AM Poet 🥀",         match:["sufi","ghazal","arijit","soulful"],
+    track:{ id:"56zZ48jdyY2oDXHVnwg5Di", name:"Tum Hi Ho",    artist:"Arijit Singh" } },
+];
+
+export function pickArchetype(genres = []){
+  const g = genres.map(x => x.toLowerCase());
+  for (const a of ARCHETYPES)
+    if (a.match.some(m => g.some(x => x.includes(m)))) return a;
+  return ARCHETYPES[Math.floor(Math.random() * ARCHETYPES.length)]; // playful fallback
+}</code></pre>
+
+<h2 id="player"><span class="n">07</span>The dashboard — "your song for the Mehfil"</h2>
+<p>Spotify's embed iframe plays a 30-sec preview for anyone, the full track if the visitor is logged into Spotify — no audio hosting, no licensing on your side. We swap its <code>src</code> to the chosen track.</p>
+<pre><span class="cap"><span class="dot"></span><span class="fn">dashboard.html</span></span><code class="language-html">&lt;section class="mehfil-card"&gt;
+  &lt;p class="kicker"&gt;🔥 This is your song for the Mehfil&lt;/p&gt;
+  &lt;h2 id="archetype"&gt;The Aux Cord King 👑&lt;/h2&gt;
+  &lt;p id="genres" class="genres"&gt;punjabi · desi hip-hop · 2am techno&lt;/p&gt;
+
+  &lt;!-- Spotify player: full track if logged in, 30s preview otherwise --&gt;
+  &lt;iframe id="player" title="Your Mehfil song"
+    style="border-radius:12px" width="100%" height="152" frameborder="0"
+    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture"
+    loading="lazy"
+    src="https://open.spotify.com/embed/track/58f4twRnbZOOVUhMUpplJ4?utm_source=mehfil"&gt;&lt;/iframe&gt;
+
+  &lt;p class="position"&gt;You're &lt;b id="pos"&gt;#4,213&lt;/b&gt; in line&lt;/p&gt;
+  &lt;button id="share" class="cta"&gt;💬 Drop the party poll in your group&lt;/button&gt;
+&lt;/section&gt;</code></pre>
+<pre><span class="cap"><span class="dot"></span><span class="fn">render.js — populate the card from the vibe</span></span><code class="language-javascript">function renderCard(vibe){
+  document.getElementById("archetype").textContent = vibe.archetype.name;
+  document.getElementById("genres").textContent    = vibe.genres.slice(0,3).join(" · ");
+  // swap the embedded player to the user's actual song (or archetype fallback)
+  const id = vibe.trackId || vibe.archetype.track.id;
+  document.getElementById("player").src =
+    `https://open.spotify.com/embed/track/${id}?utm_source=mehfil&autoplay=1`;
+}</code></pre>
+<div class="note"><b>Autoplay reality:</b> browsers block audio until a user gesture. Since the user <em>clicked</em> "Connect" to reach the dashboard, that gesture usually counts — but always keep the embed's own play button visible as the guaranteed path.</div>
+
+<h2 id="poll"><span class="n">08</span>WhatsApp party-poll share</h2>
+<p>WhatsApp can't pre-fill its <em>native</em> poll widget via a link — only text. So we pre-fill a <b>poll-styled message</b> through <code>wa.me</code> that includes the user's song, archetype, position, and referral link.</p>
+<pre><span class="cap"><span class="dot"></span><span class="fn">share.js</span></span><code class="language-javascript">function buildPollMessage({ song, artist, archetype, position, refLink }){
+  return (
+`🍻 *MEHFIL — party poll. Who's IN?*
+
+I just claimed my spot (${position}) 🎵
+My song for the Mehfil: *${song}* — ${artist}
+My vibe: ${archetype}
+
+Vote 👇 + grab yours:
+✅ I'm IN → ${refLink}
+😴 I'm out (ok loser)
+
+Last one to join buys the first round 👀`
+  );
+}
+
+function shareToWhatsApp(vibe, pos, refCode){
+  const refLink = `https://mehfil.com/?ref=${refCode}`;
+  const text = buildPollMessage({
+    song: vibe.trackName, artist: vibe.artist,
+    archetype: vibe.archetype.name, position: pos, refLink,
+  });
+  // opens WhatsApp (mobile app / web) with the message pre-typed
+  location.href = `https://wa.me/?text=${encodeURIComponent(text)}`;
+}</code></pre>
+<p class="mut" style="font-size:14px">Optional "real poll" path: render a <b>Copy poll options</b> button (<code>I'm in / Maybe / I'm out</code>) and tell the user to paste them into a native WhatsApp group poll — more authentic, one extra step. Link-unfurl preview (the song image) is set via Open Graph meta tags on the landing page.</p>
+
+<h2 id="waitlist"><span class="n">09</span>Referral waitlist — the line-jump</h2>
+<p>Position is server-authoritative. Joining via someone's <code>?ref=</code> credits the referrer and moves them up a fixed number of spots.</p>
+<pre><span class="cap"><span class="dot"></span><span class="fn">api/waitlist/join.js</span></span><code class="language-javascript">const JUMP_PER_REFERRAL = 300;
+
+// POST { archetype, trackId, ref }  ->  { position, refCode }
+export default async function join(req, res){
+  const { archetype, trackId, ref } = req.body;
+  const refCode = crypto.randomUUID().slice(0, 8);
+
+  // 1. create the row at the back of the line
+  const { id, joined_at } = await db.insert("waitlist", {
+    ref_code: refCode, referred_by: ref ?? null, archetype, track_id: trackId,
+  });
+
+  // 2. if they came from a referral, move the referrer up
+  if (ref) await db.exec(
+    `UPDATE waitlist SET boost = boost + $1 WHERE ref_code = $2`,
+    [JUMP_PER_REFERRAL, ref]);
+
+  const position = await positionFor(refCode);
+  res.json({ position, refCode });
+}
+
+// effective position = signup order minus the spots you've earned
+async function positionFor(refCode){
+  const row = await db.one(
+    `SELECT joined_at, boost FROM waitlist WHERE ref_code = $1`, [refCode]);
+  const ahead = await db.count(
+    `SELECT 1 FROM waitlist WHERE joined_at < $1`, [row.joined_at]);
+  return Math.max(1, ahead + 1 - row.boost);
+}</code></pre>
+<pre><span class="cap"><span class="dot"></span><span class="fn">live-position.js — front-end poll + animated bar</span></span><code class="language-javascript">async function refreshPosition(refCode){
+  const { position } = await fetch(`/api/waitlist/position?ref=${refCode}`).then(r=>r.json());
+  const el = document.getElementById("pos");
+  const from = parseInt(el.dataset.v || position, 10);
+  animateCount(el, from, position);          // satisfying climb when friends join
+  el.dataset.v = position;
+}
+setInterval(() => refreshPosition(localStorage.ref), 8000);
+
+function animateCount(el, from, to){
+  const t0 = performance.now(), dur = 600;
+  (function tick(t){
+    const k = Math.min(1, (t - t0) / dur);
+    const v = Math.round(from + (to - from) * k);
+    el.textContent = "#" + v.toLocaleString();
+    if (k < 1) requestAnimationFrame(tick);
+  })(performance.now());
+}</code></pre>
+<div class="note"><b>Anti-abuse:</b> credit a referral only on a real signup (validated music-connect or verified email), de-dupe by device/IP, and cap jumps per hour. Otherwise the line is gameable with throwaway tabs.</div>
+
+<h2 id="v1"><span class="n">10</span>v1 (ship today) vs v2 (real)</h2>
+<div class="grid">
+  <div class="card">
+    <h4>v1 — teaser, no backend</h4>
+    <p style="margin-top:6px">
+      <span class="pill">Faked connect</span><span class="pill">3-tap vibe → archetype</span>
+      <span class="pill">Embedded song</span><span class="pill">wa.me poll</span>
+      <span class="pill">Counter + position in JS</span>
+    </p>
+    <p>Ships in hours. Looks identical to the real thing. Collects emails/links and validates the FOMO loop before you build infra.</p>
+  </div>
+  <div class="card">
+    <h4>v2 — real product</h4>
+    <p style="margin-top:6px">
+      <span class="pill ok">Spotify OAuth (PKCE)</span><span class="pill ok">Real top track</span>
+      <span class="pill ok">Server-authoritative referrals</span><span class="pill ok">Supabase ledger</span>
+      <span class="pill ok">Quota extension filed</span>
+    </p>
+    <p>Adds the backend (§3), the token swap (§5), and the referral DB (§9). File the Spotify quota extension early — it gates public launch.</p>
+  </div>
+</div>
+
+<footer>
+  Mehfil · Implementation doc v1 · Spotify endpoint status per developer.spotify.com (Nov 2024 changes). Track IDs verified live. Replace placeholder client IDs, redirect URIs, and the <code>mehfil.com</code> domain before deploy.
+</footer>
+
+</div>
+<script>hljs.highlightAll();</script>
+</body>
+</html>
