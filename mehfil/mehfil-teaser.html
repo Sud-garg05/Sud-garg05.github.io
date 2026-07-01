@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mehfil — Your Song. Your Crowd.</title>
+  <meta name="description" content="The party starts with your vibe. Claim your spot before your city fills up.">
+  <meta property="og:title"       content="Mehfil — Who's IN? 🎵">
+  <meta property="og:description" content="I just claimed my spot. Drop the party poll in your group.">
+  <meta property="og:image"       content="https://mehfil.app/og.jpg">
+  <meta property="og:url"         content="https://mehfil.app">
+  <meta property="og:type"        content="website">
+  <meta name="twitter:card"       content="summary_large_image">
+  <!--
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  SETUP CHECKLIST — fill CFG block in the JS below, then deploy  ║
+  ╠══════════════════════════════════════════════════════════════════╣
+  ║  POCKETBASE                                                      ║
+  ║  1. Download + run: ./pocketbase serve                           ║
+  ║  2. Open http://localhost:8090/_/ → create admin account         ║
+  ║  3. New collection "waitlist" with these Text/Number/Bool fields:║
+  ║       name, email*, phone, city, auth_provider                   ║
+  ║       archetype_id, archetype_name, track_id, track_name         ║
+  ║       track_artist, genres, ref_code*, referred_by               ║
+  ║       base_position (Number), boost (Number, default 0)          ║
+  ║       referral_count (Number, default 0), wa_joined (Bool)       ║
+  ║     (* = unique index)                                           ║
+  ║  4. API Rules → Create: "" (public), List/View: "", others: admin║
+  ║  5. Settings → Mail → configure SMTP for welcome emails          ║
+  ║  6. Copy pb_hooks/mehfil.pb.js → your pb_hooks/ folder          ║
+  ║  7. Set CFG.PB_URL to your PocketBase URL below                  ║
+  ║                                                                  ║
+  ║  SPOTIFY                                                         ║
+  ║  1. developer.spotify.com → Dashboard → Create app              ║
+  ║  2. Add Redirect URI = this page's URL (exact match)             ║
+  ║  3. Set CFG.SPOTIFY_CLIENT_ID below                              ║
+  ║  4. Submit quota extension BEFORE public launch (dev = 25 users) ║
+  ║                                                                  ║
+  ║  GOOGLE                                                          ║
+  ║  1. console.cloud.google.com → APIs & Services → Credentials     ║
+  ║  2. Create OAuth 2.0 Client ID → Web application                 ║
+  ║  3. Authorized JS origins: this page's origin                    ║
+  ║  4. Set CFG.GOOGLE_CLIENT_ID below                               ║
+  ║                                                                  ║
+  ║  WHATSAPP COMMUNITY                                              ║
+  ║  1. Open WhatsApp → New community → copy invite link             ║
+  ║  2. Set CFG.WA_COMMUNITY_LINK below                              ║
+  ╚══════════════════════════════════════════════════════════════════╝
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:   #08050f;
+      --card: rgba(18,10,30,.78);
+      --line: rgba(255,255,255,.07);
+      --ink:  #f3ecff;
+      --mut:  #a99dc4;
+      --acc:  #ff3d8b;
+      --acc2: #9b5cff;
+      --grn:  #1db954;
+      --wa:   #25D366;
+      --f:    'Inter', -apple-system, sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--f); background: var(--bg); color: var(--ink);
+      min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+    }
+
+    /* orbs */
+    .orb { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; animation: drift 18s ease-in-out infinite alternate; }
+    .orb-pink   { width: 700px; height: 700px; background: rgba(255,61,139,.13); top: -250px; right: -200px; }
+    .orb-purple { width: 550px; height: 550px; background: rgba(155,92,255,.11); bottom: 0; left: -200px; animation-delay: -9s; }
+    @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,30px) scale(1.08); } }
+
+    /* ticker */
+    #ticker {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: 36px; overflow: hidden;
+      background: rgba(8,5,15,.88); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line); display: flex; align-items: center;
+    }
+    .t-track { display: flex; white-space: nowrap; animation: t-scroll 36s linear infinite; }
+    .t-item  { font-size: 12px; color: var(--mut); padding: 0 28px; display: flex; align-items: center; gap: 7px; }
+    .t-dot   { width: 5px; height: 5px; border-radius: 50%; background: var(--grn); animation: blink 2s ease-in-out infinite; }
+    @keyframes t-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+
+    /* layout */
+    main { position: relative; z-index: 1; min-height: 100vh; padding: 68px 20px 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .section { width: 100%; max-width: 460px; }
+
+    /* hero */
+    #hero { text-align: center; }
+    .live-pill { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--mut); background: rgba(29,185,84,.07); border: 1px solid rgba(29,185,84,.2); padding: 6px 14px; border-radius: 999px; margin-bottom: 28px; }
+    .live-pill .ldot { width: 7px; height: 7px; border-radius: 50%; background: var(--grn); animation: blink 1.4s ease-in-out infinite; }
+    #hero h1 { font-size: clamp(38px,9vw,62px); font-weight: 900; line-height: 1.0; letter-spacing: -.03em; margin-bottom: 18px; }
+    .g { background: linear-gradient(135deg,var(--acc),var(--acc2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    #hero .sub { font-size: 16px; color: var(--mut); line-height: 1.6; max-width: 360px; margin: 0 auto 32px; }
+
+    /* auth buttons grid */
+    .auth-stack { display: flex; flex-direction: column; gap: 10px; }
+    .btn-spotify, .btn-google, .btn-email {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 15px 22px; font: 700 15px/1 var(--f);
+      border: none; border-radius: 13px; cursor: pointer; transition: transform .15s, box-shadow .15s;
+    }
+    .btn-spotify { background: var(--grn); color: #000; box-shadow: 0 6px 24px rgba(29,185,84,.28); }
+    .btn-spotify:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(29,185,84,.38); }
+    .btn-google  { background: #fff; color: #1f1f1f; box-shadow: 0 4px 18px rgba(0,0,0,.28); }
+    .btn-google:hover  { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,.38); }
+    .btn-email   { background: var(--card); color: var(--ink); border: 1px solid var(--line); backdrop-filter: blur(8px); }
+    .btn-email:hover   { transform: translateY(-2px); border-color: var(--acc2); }
+    .btn-spotify:active, .btn-google:active, .btn-email:active { transform: none; }
+
+    .divider { display: flex; align-items: center; gap: 12px; margin: 4px 0; color: var(--mut); font-size: 12px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+    /* loading */
+    #loading { text-align: center; }
+    .spinner { width: 44px; height: 44px; margin: 0 auto 18px; border: 3px solid var(--line); border-top-color: var(--acc); border-radius: 50%; animation: spin .75s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #load-txt { font-size: 17px; color: var(--mut); }
+
+    /* form */
+    #form { }
+    .form-head { text-align: center; margin-bottom: 22px; }
+    .form-head h2 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .form-head p  { font-size: 14px; color: var(--mut); }
+    .fgroup { margin-bottom: 14px; }
+    .fgroup label { display: block; font-size: 12px; font-weight: 600; color: var(--mut); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+    .fgroup input, .fgroup select {
+      width: 100%; padding: 13px 14px;
+      background: var(--card); border: 1px solid var(--line); border-radius: 11px;
+      font: 15px var(--f); color: var(--ink); outline: none;
+      transition: border-color .15s; backdrop-filter: blur(8px);
+    }
+    .fgroup input::placeholder { color: var(--mut); }
+    .fgroup select { appearance: none; cursor: pointer; }
+    .fgroup select option { background: #1a0f2e; }
+    .fgroup input:focus, .fgroup select:focus { border-color: var(--acc2); }
+    .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-note { font-size: 12px; color: var(--mut); text-align: center; margin-top: 8px; }
+    .form-note a { color: var(--acc); }
+
+    /* quiz */
+    #quiz { }
+    .quiz-head { text-align: center; margin-bottom: 20px; }
+    .quiz-head h2 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .quiz-head p  { font-size: 14px; color: var(--mut); }
+    .quota-note { font-size: 13px; color: var(--mut); background: rgba(255,61,139,.06); border: 1px solid rgba(255,61,139,.15); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; text-align: center; display: none; }
+    .quota-note.on { display: block; }
+    .qopts { display: grid; gap: 9px; }
+    .qopt { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 13px; cursor: pointer; text-align: left; font: 500 15px var(--f); color: var(--ink); transition: border-color .15s, background .15s, transform .12s; backdrop-filter: blur(12px); }
+    .qopt:hover  { border-color: var(--acc2); background: rgba(155,92,255,.1); transform: translateX(4px); }
+    .qopt:active { transform: none; }
+    .qopt .emo { font-size: 26px; flex-shrink: 0; }
+    .qopt .ql  { font-size: 14px; font-weight: 600; }
+    .qopt .qd  { font-size: 12px; color: var(--mut); margin-top: 2px; }
+
+    /* dashboard */
+    #dashboard { }
+    .mcard { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 24px 22px; backdrop-filter: blur(20px); position: relative; overflow: hidden; }
+    .mcard::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg,rgba(255,61,139,.04),rgba(155,92,255,.04)); pointer-events: none; }
+    .kicker { font-size: 11px; text-transform: uppercase; letter-spacing: .14em; color: var(--acc); font-weight: 600; margin-bottom: 8px; }
+    .arch-name { font-size: 24px; font-weight: 900; letter-spacing: -.02em; line-height: 1.1; margin-bottom: 6px; animation: pop-in .55s cubic-bezier(.34,1.56,.64,1) both; }
+    @keyframes pop-in { from { opacity:0; transform:translateY(8px) scale(.96); } to { opacity:1; transform:none; } }
+    .gtags { font-size: 13px; color: var(--mut); margin-bottom: 16px; }
+    #player { border-radius: 12px; width: 100%; border: none; display: block; margin-bottom: 16px; }
+
+    /* position */
+    .pos-block { text-align: center; margin-bottom: 14px; }
+    .pos-label { font-size: 12px; color: var(--mut); margin-bottom: 2px; }
+    .pos-num { font-size: 42px; font-weight: 900; letter-spacing: -.04em; background: linear-gradient(135deg,var(--acc),var(--acc2)); -webkit-background-clip: text; background-clip: text; color: transparent; font-variant-numeric: tabular-nums; }
+    .pos-sub { font-size: 12px; color: var(--mut); margin-top: 2px; }
+
+    /* referral stats */
+    .ref-stats { display: flex; gap: 8px; margin-bottom: 12px; }
+    .stat-box { flex: 1; background: rgba(155,92,255,.07); border: 1px solid rgba(155,92,255,.14); border-radius: 11px; padding: 10px 12px; text-align: center; }
+    .stat-val { font-size: 20px; font-weight: 800; color: var(--acc2); }
+    .stat-lbl { font-size: 11px; color: var(--mut); margin-top: 2px; }
+
+    /* VIP bar */
+    .vip { background: rgba(155,92,255,.07); border: 1px solid rgba(155,92,255,.14); border-radius: 11px; padding: 11px 14px; margin-bottom: 12px; }
+    .vip-lbl { font-size: 13px; color: var(--mut); margin-bottom: 7px; }
+    .vip-lbl strong { color: var(--acc2); }
+    .vip-bar { height: 4px; background: rgba(255,255,255,.07); border-radius: 2px; overflow: hidden; }
+    .vip-fill { height: 100%; background: linear-gradient(90deg,var(--acc2),var(--acc)); border-radius: 2px; transition: width 1.2s ease; }
+
+    /* action buttons */
+    .btn-wa, .btn-wa-comm {
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      width: 100%; padding: 15px 22px; font: 700 15px/1 var(--f);
+      border: none; border-radius: 13px; cursor: pointer; transition: transform .15s, box-shadow .15s;
+      margin-bottom: 10px;
+    }
+    .btn-wa      { background: var(--wa); color: #fff; box-shadow: 0 6px 24px rgba(37,211,102,.22); }
+    .btn-wa-comm { background: rgba(37,211,102,.1); color: var(--wa); border: 1px solid rgba(37,211,102,.25); }
+    .btn-wa:hover, .btn-wa-comm:hover { transform: translateY(-2px); }
+    .btn-wa.joined { background: rgba(37,211,102,.15); color: var(--wa); border: 1px solid rgba(37,211,102,.25); box-shadow: none; cursor: default; }
+    .btn-wa:active, .btn-wa-comm:active { transform: none; }
+
+    /* referral link block */
+    .ref-block { margin-top: 14px; background: rgba(29,185,84,.05); border: 1px solid rgba(29,185,84,.15); border-radius: 11px; padding: 13px 13px; display: none; }
+    .ref-block.on { display: block; animation: fade-up .4s ease both; }
+    .ref-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--mut); margin-bottom: 7px; }
+    .ref-row { display: flex; gap: 8px; align-items: stretch; }
+    .ref-url { flex: 1; font-size: 12px; color: var(--grn); background: rgba(0,0,0,.3); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: ui-monospace, monospace; }
+    .ref-copy { padding: 0 14px; background: var(--grn); color: #000; font: 600 13px var(--f); border: none; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: opacity .15s; }
+    .ref-copy:hover { opacity: .85; }
+    .ref-jump { font-size: 12px; color: var(--mut); margin-top: 6px; }
+    .ref-jump strong { color: var(--grn); }
+
+    /* countdown */
+    .cdwn { margin: 16px 0 0; text-align: center; }
+    .cdwn-lbl { font-size: 11px; color: var(--mut); text-transform: uppercase; letter-spacing: .1em; }
+    .cdwn-val { font-size: 19px; font-weight: 700; color: var(--acc); margin-top: 3px; font-variant-numeric: tabular-nums; }
+
+    /* primary submit */
+    .btn-primary { display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; padding: 15px 22px; background: linear-gradient(135deg,var(--acc),var(--acc2)); color: #fff; font: 700 15px/1 var(--f); border: none; border-radius: 13px; cursor: pointer; transition: transform .15s, opacity .15s; margin-top: 6px; }
+    .btn-primary:hover  { transform: translateY(-2px); }
+    .btn-primary:active { transform: none; }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    .btn-back { background: none; border: none; font: 14px var(--f); color: var(--mut); cursor: pointer; margin-top: 14px; display: block; width: 100%; text-align: center; transition: color .15s; }
+    .btn-back:hover { color: var(--ink); }
+
+    /* utils */
+    [hidden] { display: none !important; }
+    .fade-up { animation: fade-up .45s ease both; }
+    @keyframes fade-up { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+
+    @media (max-width: 480px) {
+      main { padding: 56px 16px 36px; }
+      #hero h1 { font-size: 40px; }
+      .frow { grid-template-columns: 1fr; }
+      .pos-num { font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="orb orb-pink"></div>
+<div class="orb orb-purple"></div>
+
+<!-- Live join ticker -->
+<div id="ticker"><div class="t-track" id="t-track"></div></div>
+
+<!-- Hidden Google Sign-In button (rendered by GIS SDK) -->
+<div id="g-btn-wrap" style="position:absolute;opacity:0;pointer-events:none"></div>
+
+<main>
+
+  <!-- ── HERO ─────────────────────────────────────── -->
+  <section id="hero" class="section fade-up">
+    <div class="live-pill"><span class="ldot"></span><span id="live-count">4,847</span>&nbsp;already in line</div>
+    <h1>Your song.<br>Your crowd.<br><span class="g">Your Mehfil.</span></h1>
+    <p class="sub">The party starts with your vibe. Join the waitlist and claim your spot before your city fills up.</p>
+
+    <div class="auth-stack">
+      <button class="btn-spotify" id="btn-spotify">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+        Connect Spotify
+      </button>
+      <div class="divider">or</div>
+      <button class="btn-google" id="btn-google">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+      <div class="divider">or</div>
+      <button class="btn-email" id="btn-email">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Join with email
+      </button>
+    </div>
+  </section>
+
+  <!-- ── LOADING ────────────────────────────────────── -->
+  <section id="loading" class="section" hidden>
+    <div class="spinner"></div>
+    <p id="load-txt">Reading your vibe…</p>
+  </section>
+
+  <!-- ── MANUAL FORM ──────────────────────────────── -->
+  <section id="form" class="section fade-up" hidden>
+    <div class="form-head">
+      <h2>Claim your spot</h2>
+      <p>We'll send your invite here first.</p>
+    </div>
+    <form id="signup-form" novalidate>
+      <div class="fgroup">
+        <label>Full name *</label>
+        <input type="text" id="f-name" placeholder="Arjun Sharma" required autocomplete="name">
+      </div>
+      <div class="fgroup">
+        <label>Email *</label>
+        <input type="email" id="f-email" placeholder="you@email.com" required autocomplete="email">
+      </div>
+      <div class="frow">
+        <div class="fgroup">
+          <label>WhatsApp number</label>
+          <input type="tel" id="f-phone" placeholder="+91 98765 43210" autocomplete="tel">
+        </div>
+        <div class="fgroup">
+          <label>Your city</label>
+          <select id="f-city">
+            <option value="">Select…</option>
+            <option>Mumbai</option>
+            <option>Delhi</option>
+            <option>Bangalore</option>
+            <option>Pune</option>
+            <option>Hyderabad</option>
+            <option>Chennai</option>
+            <option>Kolkata</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary" id="form-submit">Get my spot →</button>
+      <p class="form-note">No spam. Ever. Just your Mehfil invite.</p>
+    </form>
+    <button class="btn-back" id="form-back">← Back</button>
+  </section>
+
+  <!-- ── QUIZ (vibe picker) ─────────────────────────── -->
+  <section id="quiz" class="section fade-up" hidden>
+    <div class="quota-note" id="quota-note">Spotify is at capacity for now — show us your vibe instead 🎵</div>
+    <div class="quiz-head">
+      <h2>Pick your Mehfil vibe</h2>
+      <p>One tap. No wrong answers.</p>
+    </div>
+    <div class="qopts" id="qopts"></div>
+  </section>
+
+  <!-- ── DASHBOARD ─────────────────────────────────── -->
+  <section id="dashboard" class="section fade-up" hidden>
+    <div class="mcard">
+      <p class="kicker">🔥 This is your song for the Mehfil</p>
+      <h2 class="arch-name" id="arch-name"></h2>
+      <p class="gtags" id="gtags"></p>
+      <iframe id="player" height="152" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" loading="lazy"></iframe>
+
+      <div class="pos-block">
+        <p class="pos-label">You're in line at</p>
+        <div class="pos-num" id="pos-num">#—</div>
+        <p class="pos-sub">Share your link → each friend who joins moves you up 300 spots</p>
+      </div>
+
+      <!-- Referral stats (shown after first share) -->
+      <div class="ref-stats" id="ref-stats" style="display:none">
+        <div class="stat-box"><div class="stat-val" id="stat-refs">0</div><div class="stat-lbl">Friends joined</div></div>
+        <div class="stat-box"><div class="stat-val" id="stat-jump">0</div><div class="stat-lbl">Spots jumped</div></div>
+      </div>
+
+      <div class="vip">
+        <p class="vip-lbl"><strong id="vip-n">142</strong> of 200 early VIP spots in <strong id="dash-city">Mumbai</strong></p>
+        <div class="vip-bar"><div class="vip-fill" id="vip-fill" style="width:71%"></div></div>
+      </div>
+
+      <!-- Share to WhatsApp -->
+      <button class="btn-wa" id="btn-share">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        Drop the party poll in your group
+      </button>
+
+      <!-- Join WhatsApp Community -->
+      <button class="btn-wa-comm" id="btn-wa-comm">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+        Join the Mehfil WhatsApp community
+      </button>
+    </div>
+
+    <!-- Referral link (shown after first share) -->
+    <div class="ref-block" id="ref-block">
+      <p class="ref-lbl">Your referral link</p>
+      <div class="ref-row">
+        <div class="ref-url" id="ref-url-display"></div>
+        <button class="ref-copy" id="ref-copy">Copy</button>
+      </div>
+      <p class="ref-jump">Each friend who joins via your link → <strong>+300 spots up</strong></p>
+    </div>
+
+    <div class="cdwn">
+      <div class="cdwn-lbl">Early access closes in</div>
+      <div class="cdwn-val" id="cdwn"></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- PocketBase SDK -->
+<script src="https://unpkg.com/pocketbase/dist/pocketbase.umd.js"></script>
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CONFIG — fill before deploying
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const CFG = {
+  SPOTIFY_CLIENT_ID:  'YOUR_SPOTIFY_CLIENT_ID',
+  GOOGLE_CLIENT_ID:   'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+  PB_URL:             'https://your-pocketbase-instance.com',
+  WA_COMMUNITY_LINK:  'https://chat.whatsapp.com/YOUR_COMMUNITY_INVITE_CODE',
+  REDIRECT_URI:       location.origin + location.pathname,
+  SPOTIFY_SCOPES:     'user-top-read user-read-recently-played user-read-email user-read-private',
+  JUMP_PER_REF:       300,
+  CLOSE_DATE:         new Date('2026-07-04T23:59:59'),
+}
+
+// PocketBase ready flag (gracefully degrades to localStorage if unconfigured)
+const PB_LIVE = CFG.PB_URL !== 'https://your-pocketbase-instance.com'
+const pb      = PB_LIVE ? new PocketBase(CFG.PB_URL) : null
+if (pb) pb.autoCancellation(false)
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ARCHETYPES
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const ARCH = [
+  { id:'aux',   name:'The Aux Cord King 👑',    match:['punjabi','desi hip hop','hip hop','rap','desi'],
+    track:{ id:'58f4twRnbZOOVUhMUpplJ4', name:'Brown Munde',  artist:'AP Dhillon'  }, desc:'You run the playlist. No negotiations.' },
+  { id:'floor', name:'The Floor Filler 🕺',      match:['bollywood','filmi','dance','desi pop','pop'],
+    track:{ id:'1oBLwCymyED4c1KrvkT2HB', name:'Kala Chashma', artist:'Badshah'     }, desc:'First on the floor, last to leave it.' },
+  { id:'last',  name:'The Last One Standing 🔊', match:['edm','techno','house','electro','electronic','trance'],
+    track:{ id:'6Xe9wT5xeZETPwtaP2ynUz', name:'Levels',       artist:'Avicii'      }, desc:'You outlast everyone. Every time.' },
+  { id:'wine',  name:'The Slow Wine 🍷',         match:['afrobeats','amapiano','r&b','afropop','soul'],
+    track:{ id:'0VT0pD48jzdje9AktC2Vgv', name:'Calm Down',    artist:'Rema'        }, desc:'Smooth moves. Good wine. Your own pace.' },
+  { id:'poet',  name:'The 2AM Poet 🥀',          match:['sufi','ghazal','indie','acoustic','soulful','romantic'],
+    track:{ id:'56zZ48jdyY2oDXHVnwg5Di', name:'Tum Hi Ho',   artist:'Arijit Singh' }, desc:'Best conversations in the corner.' },
+]
+
+function pickArch(genres = []) {
+  const g = genres.map(x => x.toLowerCase())
+  for (const a of ARCH) if (a.match.some(m => g.some(x => x.includes(m)))) return a
+  return ARCH[Math.floor(Math.random() * ARCH.length)]
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// STATE (in-memory context for the current journey)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const STATE = {
+  pendingUser: null,   // { name, email, phone, city, provider } — set by Google / form, consumed by quiz → save
+  pollingTimer: null,
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// POCKETBASE helpers
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function pbSaveUser(userData, vibe) {
+  if (!pb) return localSaveUser(userData, vibe)
+
+  const refCode = Math.random().toString(36).slice(2,10).toUpperCase()
+  const refBy   = localStorage.getItem('mehfil_ref_by') || ''
+
+  // Count existing records to assign base position
+  let basePos = 1
+  try {
+    const { totalItems } = await pb.collection('waitlist').getList(1, 1)
+    basePos = totalItems + 1
+  } catch {}
+
+  const payload = {
+    name:           userData.name || '',
+    email:          userData.email || '',
+    phone:          userData.phone || '',
+    city:           userData.city  || '',
+    auth_provider:  userData.provider,
+    archetype_id:   vibe.archetype.id,
+    archetype_name: vibe.archetype.name,
+    track_id:       vibe.trackId    || vibe.archetype.track.id,
+    track_name:     vibe.trackName  || vibe.archetype.track.name,
+    track_artist:   vibe.artist     || vibe.archetype.track.artist,
+    genres:         JSON.stringify(vibe.genres || []),
+    ref_code:       refCode,
+    referred_by:    refBy,
+    base_position:  basePos,
+    boost:          0,
+    referral_count: 0,
+    wa_joined:      false,
+  }
+
+  try {
+    const record = await pb.collection('waitlist').create(payload)
+    const stored = { id: record.id, refCode, position: basePos, referralCount: 0 }
+    localStorage.setItem('mehfil_record', JSON.stringify(stored))
+    localStorage.setItem('mehfil_vibe',   JSON.stringify(vibe))
+    localStorage.setItem('mehfil_udata',  JSON.stringify(userData))
+    return { ...stored }
+  } catch (err) {
+    // Duplicate email → load existing record
+    if (err?.response?.code === 400) {
+      try {
+        const existing = await pb.collection('waitlist').getFirstListItem(`email="${payload.email}"`)
+        const stored = {
+          id: existing.id,
+          refCode: existing.ref_code,
+          position: Math.max(1, existing.base_position - existing.boost),
+          referralCount: existing.referral_count,
+        }
+        localStorage.setItem('mehfil_record', JSON.stringify(stored))
+        localStorage.setItem('mehfil_vibe',   JSON.stringify(vibe))
+        localStorage.setItem('mehfil_udata',  JSON.stringify(userData))
+        return { ...stored }
+      } catch {}
+    }
+    // PocketBase unavailable — fallback
+    return localSaveUser(userData, vibe)
+  }
+}
+
+function localSaveUser(userData, vibe) {
+  const refCode = Math.random().toString(36).slice(2,10).toUpperCase()
+  const basePos = 10000 + Math.floor(Math.random() * 5000)
+  const stored  = { id: null, refCode, position: basePos, referralCount: 0 }
+  localStorage.setItem('mehfil_record', JSON.stringify(stored))
+  localStorage.setItem('mehfil_vibe',   JSON.stringify(vibe))
+  localStorage.setItem('mehfil_udata',  JSON.stringify(userData))
+  return stored
+}
+
+async function pbGetPosition(recordId) {
+  if (!pb || !recordId) return null
+  try {
+    const r = await pb.collection('waitlist').getOne(recordId, { fields: 'base_position,boost,referral_count,wa_joined' })
+    return { position: Math.max(1, r.base_position - r.boost), referralCount: r.referral_count, waJoined: r.wa_joined }
+  } catch { return null }
+}
+
+async function pbMarkWAJoined(recordId) {
+  if (!pb || !recordId) return
+  try { await pb.collection('waitlist').update(recordId, { wa_joined: true }) } catch {}
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// SPOTIFY PKCE (client-side, no backend)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function b64url(buf) {
+  return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')
+}
+
+async function startSpotifyLogin() {
+  const ver  = b64url(crypto.getRandomValues(new Uint8Array(64)))
+  const chal = b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ver)))
+  sessionStorage.setItem('pkce_v', ver)
+  sessionStorage.setItem('auth_type', 'spotify')
+  const p = new URLSearchParams({
+    client_id: CFG.SPOTIFY_CLIENT_ID, response_type: 'code',
+    redirect_uri: CFG.REDIRECT_URI, scope: CFG.SPOTIFY_SCOPES,
+    code_challenge_method: 'S256', code_challenge: chal,
+  })
+  location.href = 'https://accounts.spotify.com/authorize?' + p
+}
+
+async function redeemSpotifyCode(code) {
+  const ver = sessionStorage.getItem('pkce_v')
+  if (!ver) return null
+  sessionStorage.removeItem('pkce_v')
+  try {
+    const r = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code', code,
+        redirect_uri: CFG.REDIRECT_URI, client_id: CFG.SPOTIFY_CLIENT_ID, code_verifier: ver,
+      }),
+    })
+    if (!r.ok) return null
+    return (await r.json()).access_token
+  } catch { return null }
+}
+
+async function fetchSpotifyVibe(token) {
+  const h = { headers: { Authorization: 'Bearer ' + token } }
+  const [meRes, trRes, arRes] = await Promise.all([
+    fetch('https://api.spotify.com/v1/me', h),
+    fetch('https://api.spotify.com/v1/me/top/tracks?limit=5&time_range=short_term', h),
+    fetch('https://api.spotify.com/v1/me/top/artists?limit=10&time_range=short_term', h),
+  ])
+  if ([403,429].includes(trRes.status) || [403,429].includes(arRes.status)) return { quota: true }
+  if (!trRes.ok || !arRes.ok) return null
+
+  const [me, tracks, artists] = await Promise.all([meRes.json(), trRes.json(), arRes.json()])
+  if (!tracks.items?.length) return { quota: true }
+
+  const top    = tracks.items[0]
+  const genres = [...new Set(artists.items.flatMap(a => a.genres || []))]
+  return {
+    userData: { name: me.display_name || '', email: me.email || '', phone: '', city: '', provider: 'spotify' },
+    vibe: {
+      trackId: top.id, trackName: top.name, artist: top.artists[0].name,
+      genres, archetype: pickArch(genres), source: 'spotify',
+    },
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// GOOGLE IDENTITY SERVICES
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function initGIS() {
+  if (!window.google?.accounts?.id) { setTimeout(initGIS, 150); return }
+  google.accounts.id.initialize({
+    client_id: CFG.GOOGLE_CLIENT_ID,
+    callback:  onGoogleCredential,
+    auto_select: false,
+    cancel_on_tap_outside: true,
+  })
+}
+
+function triggerGoogleLogin() {
+  if (!window.google?.accounts?.id) { alert('Google sign-in not loaded yet. Try again.'); return }
+  google.accounts.id.prompt((n) => {
+    // One-tap was suppressed (ad-blocker, incognito, etc.) — show a redirect fallback
+    if (n.isNotDisplayed() || n.isSkippedMoment()) {
+      // Render a proper Google button inside our hidden div and programmatically click it
+      google.accounts.id.renderButton(document.getElementById('g-btn-wrap'), {
+        type: 'standard', size: 'large', width: 460,
+      })
+      setTimeout(() => {
+        const btn = document.querySelector('#g-btn-wrap iframe')
+        if (btn) btn.click()
+      }, 200)
+    }
+  })
+}
+
+function onGoogleCredential(response) {
+  // Decode JWT payload from Google (we trust GIS signed this)
+  try {
+    const parts   = response.credential.split('.')
+    const payload = JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')))
+    const userData = { name: payload.name || '', email: payload.email || '', phone: '', city: '', provider: 'google' }
+    // Show quiz so we can assign their music archetype
+    STATE.pendingUser = userData
+    showQuiz(false)
+  } catch { show('hero') }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// QUIZ
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function showQuiz(quotaHit = false) {
+  if (quotaHit) document.getElementById('quota-note').classList.add('on')
+  const opts = [
+    { id:'aux',   emo:'👑', lbl:'Aux Cord King',     desc:'I run the playlist. No negotiations.' },
+    { id:'floor', emo:'🕺', lbl:'Floor Filler',       desc:'First on the floor, last to leave it.' },
+    { id:'last',  emo:'🔊', lbl:'Last One Standing',  desc:'I outlast everyone. Every time.' },
+    { id:'wine',  emo:'🍷', lbl:'Slow Wine',          desc:'Smooth moves. My own pace.' },
+    { id:'poet',  emo:'🥀', lbl:'2AM Poet',           desc:'Best conversations in the corner.' },
+  ]
+  const c = document.getElementById('qopts')
+  c.innerHTML = ''
+  opts.forEach(o => {
+    const a   = ARCH.find(x => x.id === o.id)
+    const btn = document.createElement('button')
+    btn.className = 'qopt'
+    btn.innerHTML = `<span class="emo">${o.emo}</span><div><div class="ql">${o.lbl}</div><div class="qd">${o.desc}</div></div>`
+    btn.onclick = () => onQuizPick(a)
+    c.appendChild(btn)
+  })
+  show('quiz')
+}
+
+async function onQuizPick(archetype) {
+  const vibe = { archetype, trackId: archetype.track.id, trackName: archetype.track.name, artist: archetype.track.artist, genres: archetype.match, source: 'quiz' }
+  // For Spotify quota fallback, pendingUser might be null — show mini email form
+  if (!STATE.pendingUser) { await promptEmailThenSave(vibe); return }
+  await saveAndDash(STATE.pendingUser, vibe)
+}
+
+// Mini email prompt when Spotify gives no email (e.g., quota fallback with no user data)
+async function promptEmailThenSave(vibe) {
+  const email = prompt('Enter your email to save your spot:')
+  if (!email || !email.includes('@')) { alert('Valid email required.'); return }
+  const name  = prompt('Your name (optional):') || ''
+  await saveAndDash({ name, email, phone: '', city: '', provider: 'spotify_fallback' }, vibe)
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// MANUAL FORM
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function showForm() { show('form') }
+
+function handleFormSubmit(e) {
+  e.preventDefault()
+  const name  = document.getElementById('f-name').value.trim()
+  const email = document.getElementById('f-email').value.trim()
+  const phone = document.getElementById('f-phone').value.trim()
+  const city  = document.getElementById('f-city').value
+  if (!name || !email) { document.getElementById('f-name').focus(); return }
+  STATE.pendingUser = { name, email, phone, city, provider: 'manual' }
+  showQuiz(false)
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// SAVE + SHOW DASHBOARD
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function saveAndDash(userData, vibe) {
+  setLoad('Saving your spot…')
+  STATE.pendingUser = null
+  const record = await pbSaveUser(userData, vibe)
+  renderDash(vibe, record, userData)
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// DASHBOARD RENDER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderDash(vibe, record, userData) {
+  const { id: recordId, refCode, position, referralCount } = record
+  const posEl = document.getElementById('pos-num')
+
+  // Card content
+  document.getElementById('arch-name').textContent = vibe.archetype.name
+  document.getElementById('gtags').textContent     = (vibe.genres || []).slice(0,3).join(' · ') || vibe.archetype.desc
+
+  // Spotify embed
+  const tid = vibe.trackId || vibe.archetype.track.id
+  document.getElementById('player').src = `https://open.spotify.com/embed/track/${tid}?utm_source=mehfil&autoplay=1`
+
+  // Position (animate entry)
+  animCount(posEl, position + 600, position)
+
+  // City label
+  const city = (userData?.city) || 'your city'
+  document.getElementById('dash-city').textContent = city
+
+  // Referral link
+  const link = CFG.BASE_URL
+    ? CFG.BASE_URL + '?ref=' + refCode
+    : location.origin + location.pathname + '?ref=' + refCode
+  document.getElementById('ref-url-display').textContent = link
+
+  // Referral count (if any)
+  if (referralCount > 0) updateRefStats(referralCount)
+
+  // Copy button
+  document.getElementById('ref-copy').onclick = () => {
+    navigator.clipboard.writeText(link).catch(() => {})
+    const btn = document.getElementById('ref-copy')
+    btn.textContent = 'Copied!'
+    setTimeout(() => btn.textContent = 'Copy', 2000)
+  }
+
+  // Share to WhatsApp
+  document.getElementById('btn-share').onclick = () => onShareWA(vibe, record, link, posEl)
+
+  // WhatsApp community
+  document.getElementById('btn-wa-comm').onclick = () => onJoinCommunity(recordId)
+
+  show('dashboard')
+
+  // Start polling PocketBase for real-time position updates
+  if (recordId) startPolling(recordId, posEl)
+}
+
+function onShareWA(vibe, record, link, posEl) {
+  const msg = [
+    '🍻 *MEHFIL — party poll. Who\'s IN?*',
+    '',
+    `I just claimed my spot (#${record.position.toLocaleString('en-IN')}) 🎵`,
+    `My song for the Mehfil: *${vibe.trackName || vibe.archetype.track.name}* — ${vibe.artist || vibe.archetype.track.artist}`,
+    `My vibe: ${vibe.archetype.name}`,
+    '',
+    'Vote 👇 + grab yours:',
+    `✅ I\'m IN → ${link}`,
+    '😴 I\'m out (ok loser)',
+    '',
+    'Last one to join buys the first round 👀',
+  ].join('\n')
+
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank')
+
+  // Show referral link block
+  document.getElementById('ref-block').classList.add('on')
+
+  // Optimistic position jump for first share
+  const stored = getStored()
+  if (stored && stored.position > 1) {
+    const newPos = Math.max(1, stored.position - CFG.JUMP_PER_REF)
+    stored.position = newPos
+    localStorage.setItem('mehfil_record', JSON.stringify(stored))
+    animCount(posEl, record.position, newPos)
+    record.position = newPos
+  }
+}
+
+async function onJoinCommunity(recordId) {
+  window.open(CFG.WA_COMMUNITY_LINK, '_blank')
+  await pbMarkWAJoined(recordId)
+  const btn = document.getElementById('btn-wa-comm')
+  btn.classList.add('joined')
+  btn.innerHTML = '✓ &nbsp;Joined the Mehfil community'
+  btn.onclick = null
+}
+
+// ── Position polling ──────────────────────────────────────
+function startPolling(recordId, posEl) {
+  if (STATE.pollingTimer) clearInterval(STATE.pollingTimer)
+  STATE.pollingTimer = setInterval(async () => {
+    const fresh = await pbGetPosition(recordId)
+    if (!fresh) return
+    const stored = getStored()
+    if (stored && fresh.position !== stored.position) {
+      const prev = stored.position
+      stored.position       = fresh.position
+      stored.referralCount  = fresh.referralCount
+      localStorage.setItem('mehfil_record', JSON.stringify(stored))
+      animCount(posEl, prev, fresh.position)
+      if (fresh.referralCount > 0) updateRefStats(fresh.referralCount)
+    }
+    if (fresh.waJoined) {
+      const btn = document.getElementById('btn-wa-comm')
+      if (btn && !btn.classList.contains('joined')) {
+        btn.classList.add('joined')
+        btn.innerHTML = '✓ &nbsp;Joined the Mehfil community'
+      }
+    }
+  }, 12000)
+}
+
+function updateRefStats(count) {
+  const box = document.getElementById('ref-stats')
+  box.style.display = 'flex'
+  document.getElementById('stat-refs').textContent = count
+  document.getElementById('stat-jump').textContent = (count * CFG.JUMP_PER_REF).toLocaleString('en-IN')
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// FOMO ENGINE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const NAMES  = ['Arjun S.','Priya M.','Rohan K.','Ananya R.','Kabir V.','Sneha P.','Aditya G.','Nisha T.','Rahul D.','Meera J.','Vikram S.','Isha N.','Harsh B.','Simran K.','Ayaan M.','Riya C.','Dev P.','Kavya S.','Siddharth R.','Tara A.']
+const CITIES = ['Mumbai','Delhi','Bangalore','Pune','Hyderabad','Kolkata','Chennai']
+
+function initTicker() {
+  const track = document.getElementById('t-track')
+  ;[...Array(2)].forEach(() => {
+    NAMES.forEach((name, i) => {
+      const el = document.createElement('span')
+      el.className = 't-item'
+      el.innerHTML = `<span class="t-dot"></span>${name} from ${CITIES[i % CITIES.length]} joined as ${ARCH[i % ARCH.length].name}`
+      track.appendChild(el)
+    })
+  })
+}
+
+function initCounter() {
+  let n = 4847
+  const el = document.getElementById('live-count')
+  ;(function tick() {
+    n += Math.floor(Math.random() * 3) + 1
+    el.textContent = n.toLocaleString('en-IN')
+    setTimeout(tick, 9000 + Math.random() * 11000)
+  })()
+}
+
+function initVIP() {
+  let n = 142
+  const el = document.getElementById('vip-n')
+  setInterval(() => {
+    if (n < 199) { n++; el.textContent = n; document.getElementById('vip-fill').style.width = (n/200*100)+'%' }
+  }, 42000)
+}
+
+function initCountdown() {
+  const el = document.getElementById('cdwn')
+  function upd() {
+    const d = CFG.CLOSE_DATE - Date.now()
+    if (d <= 0) { el.textContent = 'Closed'; return }
+    const days = Math.floor(d/86400000), hrs = Math.floor((d%86400000)/3600000)
+    const mins = Math.floor((d%3600000)/60000), secs = Math.floor((d%60000)/1000)
+    el.textContent = `${days}d ${hrs}h ${mins}m ${secs}s`
+  }
+  upd(); setInterval(upd, 1000)
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// UTILITIES
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const SECTS = ['hero','loading','form','quiz','dashboard']
+function show(id)     { SECTS.forEach(s => s===id ? document.getElementById(s).removeAttribute('hidden') : document.getElementById(s).setAttribute('hidden','')) }
+function setLoad(txt) { document.getElementById('load-txt').textContent = txt; show('loading') }
+
+function animCount(el, from, to, ms = 900) {
+  const t0 = performance.now()
+  ;(function tick(t) {
+    const k = Math.min(1,(t-t0)/ms), e = 1-Math.pow(1-k,3)
+    el.textContent = '#' + Math.round(from + (to-from)*e).toLocaleString('en-IN')
+    if (k<1) requestAnimationFrame(tick)
+  })(performance.now())
+}
+
+function getStored() {
+  try { return JSON.parse(localStorage.getItem('mehfil_record')) } catch { return null }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// BOOT
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+async function boot() {
+  initTicker(); initCounter(); initVIP(); initCountdown()
+
+  // Capture incoming referral code
+  const params = new URLSearchParams(location.search)
+  const inRef  = params.get('ref')
+  if (inRef) localStorage.setItem('mehfil_ref_by', inRef)
+
+  // Init GIS in background
+  if (CFG.GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com') initGIS()
+
+  // ── Returning user → restore dashboard ──────────────────
+  const stored = getStored()
+  if (stored) {
+    setLoad('Loading your spot…')
+    try {
+      const vibe     = JSON.parse(localStorage.getItem('mehfil_vibe')  || 'null')
+      const userData = JSON.parse(localStorage.getItem('mehfil_udata') || 'null')
+      if (vibe?.archetype) {
+        // Refresh position from PocketBase if available
+        if (stored.id && pb) {
+          const fresh = await pbGetPosition(stored.id)
+          if (fresh) { stored.position = fresh.position; stored.referralCount = fresh.referralCount }
+        }
+        renderDash(vibe, stored, userData)
+        return
+      }
+    } catch {}
+  }
+
+  // ── Spotify OAuth callback ───────────────────────────────
+  if (params.has('code') || params.has('error')) {
+    history.replaceState({}, '', location.pathname)
+    const authType = sessionStorage.getItem('auth_type')
+    sessionStorage.removeItem('auth_type')
+
+    if (authType === 'spotify') {
+      setLoad('Connecting to Spotify…')
+      const code  = params.get('code')
+      const token = code ? await redeemSpotifyCode(code) : null
+      if (!token) { showQuiz(true); return }
+      setLoad('Reading your vibe…')
+      const result = await fetchSpotifyVibe(token)
+      if (!result || result.quota) { showQuiz(!!result?.quota); return }
+      setLoad('Saving your spot…')
+      const record = await pbSaveUser(result.userData, result.vibe)
+      renderDash(result.vibe, record, result.userData)
+      return
+    }
+  }
+
+  // ── Normal landing ───────────────────────────────────────
+  show('hero')
+  document.getElementById('btn-spotify').onclick = startSpotifyLogin
+  document.getElementById('btn-google').onclick  = triggerGoogleLogin
+  document.getElementById('btn-email').onclick   = showForm
+  document.getElementById('signup-form').onsubmit = handleFormSubmit
+  document.getElementById('form-back').onclick   = () => show('hero')
+}
+
+boot()
+</script>
+</body>
+</html>
