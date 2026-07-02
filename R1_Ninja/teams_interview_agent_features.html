@@ -1,0 +1,211 @@
+
+<style>
+  .section { margin-bottom: 24px; }
+  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 10px; }
+  .feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 12px; }
+  .feat-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; }
+  .feat-head { display: flex; align-items: center; gap: 9px; margin-bottom: 11px; }
+  .feat-icon { width: 32px; height: 32px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .feat-title { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+  .feat-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 7px; }
+  .feat-list li { font-size: 12.5px; color: var(--text-secondary); line-height: 1.45; display: flex; gap: 7px; align-items: flex-start; }
+  .feat-list li i { font-size: 13px; margin-top: 1px; flex-shrink: 0; }
+  .verdict-card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.1rem 1.25rem; }
+  .verdict-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 12px; }
+  .verdict-metric { background: var(--surface-1); border-radius: var(--radius); padding: 10px 12px; }
+  .verdict-metric-label { font-size: 11px; color: var(--text-muted); margin: 0 0 3px; }
+  .verdict-metric-val { font-size: 18px; font-weight: 500; color: var(--text-primary); }
+  .tag { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: var(--radius); margin-left: 6px; vertical-align: middle; }
+  .tag-warn { background: var(--bg-warning); color: var(--text-warning); }
+  .tag-new { background: var(--bg-success); color: var(--text-success); }
+  .tag-ms { background: var(--bg-accent); color: var(--text-accent); }
+</style>
+
+<h2 class="sr-only">Teams-integrated interview agent with proctoring — full feature list</h2>
+
+<div style="padding: 0.75rem 0 0;">
+
+  <div class="section">
+    <p class="section-label">Teams integration layer <span class="tag tag-ms">Microsoft Teams</span></p>
+    <div class="feat-grid">
+
+      <div class="feat-card">
+        <div class="feat-head">
+          <div class="feat-icon" style="background:var(--bg-accent)"><i class="ti ti-brand-teams" style="color:var(--text-accent)" aria-hidden="true"></i></div>
+          <span class="feat-title">Bot presence in call</span>
+        </div>
+        <ul class="feat-list">
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>AI agent joins as a bot participant via Teams Calling APIs / Graph API</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Speaks questions aloud using Azure Cognitive Speech TTS</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Listens to and transcribes candidate answers in real time (Azure STT)</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Sidebar panel shows the recruiter a live transcript + flag feed</li>
+        </ul>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-head">
+          <div class="feat-icon" style="background:var(--bg-accent)"><i class="ti ti-screen-share" style="color:var(--text-accent)" aria-hidden="true"></i></div>
+          <span class="feat-title">Screen share analysis</span>
+        </div>
+        <ul class="feat-list">
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Agent requests and receives candidate's screen share stream</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Frame-by-frame OCR detects open tabs, browser URL bar, IDE content</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>App classifier flags: ChatGPT, Copilot, StackOverflow, GitHub Copilot</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Candidate warned in-call if disallowed app or URL is detected</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <p class="section-label">Proctoring signals <span class="tag tag-warn">Anti-cheat</span></p>
+    <div class="feat-grid">
+
+      <div class="feat-card">
+        <div class="feat-head">
+          <div class="feat-icon" style="background:var(--bg-warning)"><i class="ti ti-eye" style="color:var(--text-warning)" aria-hidden="true"></i></div>
+          <span class="feat-title">Eye tracking</span>
+        </div>
+        <ul class="feat-list">
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>WebGazer.js / MediaPipe FaceMesh tracks gaze via webcam feed</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Gaze zone map: screen-centre (safe), left/right/down (flag)</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Sustained off-screen gaze (&gt;3 s) triggers a gentle verbal nudge</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Repeated off-gaze events logged as integrity flags in report</li>
+        </ul>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-head">
+          <div class="feat-icon" style="background:var(--bg-warning)"><i class="ti ti-user-scan" style="color:var(--text-warning)" aria-hidden="true"></i></div>
+          <span class="feat-title">Face & presence checks</span>
+        </div>
+        <ul class="feat-list">
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Face count detection — flags if more than one person is in frame</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Face absence alert after 5 s (candidate left desk)</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Identity re-verification snapshot at random intervals (vs. ID on file)</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Lip-sync check: mic audio must correlate with mouth movement</li>
+        </ul>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-head">
+          <div class="feat-icon" style="background:var(--bg-warning)"><i class="ti ti-device-audio-tape" style="color:var(--text-warning)" aria-hidden="true"></i></div>
+          <span class="feat-title">Audio environment checks</span>
+        </div>
+        <ul class="feat-list">
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Background voice detection — flags whispered coaching</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Earphone / headset detection heuristic (mono vs. stereo echo pattern)</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Audio gap anomaly — long silences followed by fluent answers flagged</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Keystroke-while-speaking detection (screen share audio layer)</li>
+        </ul>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-head">
+          <div class="feat-icon" style="background:var(--bg-warning)"><i class="ti ti-link-off" style="color:var(--text-warning)" aria-hidden="true"></i></div>
+          <span class="feat-title">Navigation & tab control</span>
+        </div>
+        <ul class="feat-list">
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>URL whitelist enforced — only approved domains reachable during test</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Agent narrates a warning when a blocked link is clicked on screen</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>New window / tab open event captured and flagged instantly</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Alt+Tab / Cmd+Tab frequency logged as a distraction signal</li>
+        </ul>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-head">
+          <div class="feat-icon" style="background:var(--bg-warning)"><i class="ti ti-clipboard-x" style="color:var(--text-warning)" aria-hidden="true"></i></div>
+          <span class="feat-title">Answer integrity checks</span>
+        </div>
+        <ul class="feat-list">
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Copy-paste detection in code editor (clipboard diff vs. typed)</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>AI-generated text classifier on verbal + written answers</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Response time vs. question complexity — suspiciously fast flags</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Vocabulary drift analysis — inconsistent register across rounds</li>
+        </ul>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-head">
+          <div class="feat-icon" style="background:var(--bg-warning)"><i class="ti ti-alert-triangle" style="color:var(--text-warning)" aria-hidden="true"></i></div>
+          <span class="feat-title">Real-time candidate guidance</span>
+        </div>
+        <ul class="feat-list">
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Agent speaks a verbal warning on first violation — not silent</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Second violation triggers an on-screen banner + verbal reminder</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Third violation escalates to recruiter with option to end session</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>All warnings timestamped in the integrity log</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <p class="section-label">Post-interview verdict <span class="tag tag-new">Output</span></p>
+    <div class="verdict-card">
+      <div class="feat-head" style="margin-bottom:8px">
+        <div class="feat-icon" style="background:var(--bg-pro)"><i class="ti ti-gavel" style="color:var(--text-pro)" aria-hidden="true"></i></div>
+        <span class="feat-title">Hire / Reject verdict engine</span>
+      </div>
+      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;line-height:1.5">
+        A weighted composite score across all measured parameters drives the final verdict. The recruiter sees the score breakdown, the reasoning, and a one-line recommendation.
+      </p>
+      <div class="verdict-grid">
+        <div class="verdict-metric"><p class="verdict-metric-label">Technical score</p><p class="verdict-metric-val" style="color:var(--text-accent)">0 – 100</p></div>
+        <div class="verdict-metric"><p class="verdict-metric-label">Communication</p><p class="verdict-metric-val" style="color:var(--text-accent)">0 – 100</p></div>
+        <div class="verdict-metric"><p class="verdict-metric-label">Behavioural fit</p><p class="verdict-metric-val" style="color:var(--text-accent)">0 – 100</p></div>
+        <div class="verdict-metric"><p class="verdict-metric-label">Integrity index</p><p class="verdict-metric-val" style="color:var(--text-warning)">0 – 100</p></div>
+        <div class="verdict-metric"><p class="verdict-metric-label">Proctoring flags</p><p class="verdict-metric-val" style="color:var(--text-danger)">count</p></div>
+        <div class="verdict-metric"><p class="verdict-metric-label">Composite</p><p class="verdict-metric-val" style="color:var(--text-success)">Hire / Reject</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <p class="section-label">Detailed summary report</p>
+    <div class="feat-grid">
+
+      <div class="feat-card">
+        <div class="feat-head">
+          <div class="feat-icon" style="background:var(--bg-pro)"><i class="ti ti-report-analytics" style="color:var(--text-pro)" aria-hidden="true"></i></div>
+          <span class="feat-title">Parameters measured</span>
+        </div>
+        <ul class="feat-list">
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Technical accuracy per question + topic-wise breakdown</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>STAR structure adherence in behavioural answers</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Clarity, conciseness, vocabulary richness, filler word frequency</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Confidence signals: response latency, hedging language rate</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Gaze attention score, face presence %, audio environment score</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Integrity flags with timestamp, type, and severity</li>
+        </ul>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-head">
+          <div class="feat-icon" style="background:var(--bg-pro)"><i class="ti ti-file-description" style="color:var(--text-pro)" aria-hidden="true"></i></div>
+          <span class="feat-title">Report sections</span>
+        </div>
+        <ul class="feat-list">
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Executive summary: one verdict, three bullet strengths, three concerns</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Full transcript with AI commentary on each answer</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Scored radar chart: tech, comm, behaviour, integrity, culture</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Integrity log: flag timeline with screenshot evidence</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>Comparison benchmark vs. cohort / role historical average</li>
+          <li><i class="ti ti-check" style="color:var(--text-success)" aria-hidden="true"></i>ATS-ready export (PDF, JSON) with one-click push to Greenhouse/Lever</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px">
+    <button onclick="sendPrompt('How do I integrate this interview bot with Microsoft Teams using the Graph API?')">Teams Graph API integration ↗</button>
+    <button onclick="sendPrompt('What is the best tech stack to build the eye tracking and screen analysis proctoring system?')">Proctoring tech stack ↗</button>
+    <button onclick="sendPrompt('Design the verdict scoring model — how should I weight technical, behavioural, and integrity scores?')">Verdict scoring model ↗</button>
+    <button onclick="sendPrompt('Show me a sample post-interview report output with all parameters')">Sample report output ↗</button>
+  </div>
+
+</div>

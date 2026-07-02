@@ -1,0 +1,287 @@
+
+<h2 class="sr-only">Recruitment AI tool full lifecycle roadmap — from idea to production</h2>
+
+<style>
+  .rm-wrap { font-family: var(--font-sans); padding: 1rem 0; }
+  .rm-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .rm-tab { padding: 6px 14px; border-radius: var(--radius); border: 0.5px solid var(--border-strong); background: transparent; font-size: 13px; cursor: pointer; color: var(--text-secondary); transition: all .15s; }
+  .rm-tab.active { background: var(--fill-accent); color: var(--on-accent); border-color: transparent; }
+  .rm-tab:hover:not(.active) { background: var(--surface-1); color: var(--text-primary); }
+  .rm-panel { display: none; }
+  .rm-panel.show { display: block; }
+  .phase-bar { display: flex; align-items: stretch; gap: 0; margin-bottom: 1.5rem; border-radius: 8px; overflow: hidden; border: 0.5px solid var(--border); }
+  .ph { flex: 1; padding: 10px 8px; text-align: center; font-size: 11px; font-weight: 500; cursor: pointer; transition: opacity .15s; }
+  .ph:hover { opacity: .85; }
+  .ph .ph-name { font-size: 10px; margin-bottom: 2px; }
+  .ph .ph-dur { font-size: 11px; font-weight: 500; }
+  .ph-1 { background: #e6f1fb; color: #0c447c; }
+  .ph-2 { background: #eaf3de; color: #27500a; }
+  .ph-3 { background: #faeeda; color: #633806; }
+  .ph-4 { background: #e1f5ee; color: #085041; }
+  .ph-5 { background: #EEEDFE; color: #3C3489; }
+  .ph-6 { background: #FAECE7; color: #712B13; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 1rem; }
+  .card { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; }
+  .card-head { font-size: 13px; font-weight: 500; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .card-head i { font-size: 16px; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 100px; margin-right: 4px; margin-bottom: 4px; }
+  .tag-blue { background: #e6f1fb; color: #185fa5; }
+  .tag-green { background: #eaf3de; color: #3b6d11; }
+  .tag-amber { background: #faeeda; color: #854f0b; }
+  .tag-red { background: #fcebeb; color: #a32d2d; }
+  .tag-purple { background: #EEEDFE; color: #534AB7; }
+  .tag-teal { background: #e1f5ee; color: #0f6e56; }
+  .row-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; }
+  .row-item:last-child { border-bottom: none; }
+  .row-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+  .row-text { flex: 1; }
+  .row-label { font-weight: 500; color: var(--text-primary); font-size: 13px; }
+  .row-sub { color: var(--text-secondary); font-size: 12px; margin-top: 1px; }
+  .milestone { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--surface-1); margin-bottom: 8px; font-size: 13px; }
+  .ms-week { font-size: 11px; font-weight: 500; color: var(--text-muted); width: 52px; flex-shrink: 0; }
+  .ms-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .ms-text { flex: 1; color: var(--text-primary); }
+  .ms-badge { font-size: 11px; padding: 2px 8px; border-radius: 100px; }
+  .section-title { font-size: 15px; font-weight: 500; color: var(--text-primary); margin: 1.25rem 0 .75rem; }
+  .resource-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 8px; padding: 8px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; align-items: center; }
+  .resource-row.head { font-size: 11px; font-weight: 500; color: var(--text-muted); letter-spacing: .3px; border-bottom: 0.5px solid var(--border-strong); }
+  .resource-row:last-child { border-bottom: none; }
+  .stack-col { }
+  .stack-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; }
+  .stack-item:last-child { border-bottom: none; }
+  .stack-layer { font-size: 10px; font-weight: 500; letter-spacing: .3px; color: var(--text-muted); width: 80px; flex-shrink: 0; }
+  .stack-name { font-weight: 500; color: var(--text-primary); flex: 1; }
+  .stack-why { color: var(--text-secondary); font-size: 12px; }
+  .risk-row { display: grid; grid-template-columns: 1fr 60px 1fr; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; align-items: start; }
+  .risk-row.head { font-size: 11px; color: var(--text-muted); font-weight: 500; border-bottom: 0.5px solid var(--border-strong); }
+  .risk-row:last-child { border-bottom: none; }
+  .sev { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 100px; text-align: center; }
+  .sev-h { background: #fcebeb; color: #a32d2d; }
+  .sev-m { background: #faeeda; color: #854f0b; }
+  .sev-l { background: #eaf3de; color: #3b6d11; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 1rem; }
+  .kpi { background: var(--surface-1); border-radius: var(--radius); padding: .75rem 1rem; }
+  .kpi-val { font-size: 22px; font-weight: 500; color: var(--text-primary); }
+  .kpi-label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+</style>
+
+<div class="rm-wrap">
+
+<div class="rm-tabs">
+  <button class="rm-tab active" onclick="show('overview')">Overview</button>
+  <button class="rm-tab" onclick="show('phases')">Phases & milestones</button>
+  <button class="rm-tab" onclick="show('stack')">Tech stack</button>
+  <button class="rm-tab" onclick="show('team')">Team & resources</button>
+  <button class="rm-tab" onclick="show('risks')">Risks & gates</button>
+</div>
+
+<div id="overview" class="rm-panel show">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-val">6</div><div class="kpi-label">phases total</div></div>
+    <div class="kpi"><div class="kpi-val">28 wks</div><div class="kpi-label">idea → production</div></div>
+    <div class="kpi"><div class="kpi-val">8 wks</div><div class="kpi-label">idea → POC</div></div>
+    <div class="kpi"><div class="kpi-val">7</div><div class="kpi-label">roles required</div></div>
+  </div>
+
+  <div class="phase-bar">
+    <div class="ph ph-1" onclick="show('phases')"><div class="ph-name">Discover</div><div class="ph-dur">Wk 1–2</div></div>
+    <div class="ph ph-2" onclick="show('phases')"><div class="ph-name">POC</div><div class="ph-dur">Wk 3–8</div></div>
+    <div class="ph ph-3" onclick="show('phases')"><div class="ph-name">Approval</div><div class="ph-dur">Wk 9–11</div></div>
+    <div class="ph ph-4" onclick="show('phases')"><div class="ph-name">Alpha</div><div class="ph-dur">Wk 12–17</div></div>
+    <div class="ph ph-5" onclick="show('phases')"><div class="ph-name">Beta</div><div class="ph-dur">Wk 18–23</div></div>
+    <div class="ph ph-6" onclick="show('phases')"><div class="ph-name">Production</div><div class="ph-dur">Wk 24–28</div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><i class="ti ti-target" aria-hidden="true"></i> What you're building</div>
+      <div class="row-item"><div class="row-text"><div class="row-label">CV screening & ranking</div><div class="row-sub">LLM parses resumes, scores against JD, ranks shortlist</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">JD generator</div><div class="row-sub">Generate, refine and standardise job descriptions</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Interview question builder</div><div class="row-sub">Role-aware question banks from JD + level</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Candidate scoring assistant</div><div class="row-sub">Post-interview notes → structured scorecard</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Recruiter copilot</div><div class="row-sub">Chat interface for search, outreach drafts, status updates</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><i class="ti ti-flag" aria-hidden="true"></i> Key approval gates</div>
+      <div class="row-item"><div class="row-icon" style="background:#e6f1fb;"><i class="ti ti-number-1" style="color:#185fa5;" aria-hidden="true"></i></div><div class="row-text"><div class="row-label">POC demo sign-off</div><div class="row-sub">Week 8 — stakeholder + HR head approval</div></div></div>
+      <div class="row-item"><div class="row-icon" style="background:#eaf3de;"><i class="ti ti-number-2" style="color:#3b6d11;" aria-hidden="true"></i></div><div class="row-text"><div class="row-label">Budget & legal clearance</div><div class="row-sub">Week 11 — finance + compliance + DPO sign-off</div></div></div>
+      <div class="row-item"><div class="row-icon" style="background:#faeeda;"><i class="ti ti-number-3" style="color:#854f0b;" aria-hidden="true"></i></div><div class="row-text"><div class="row-label">Alpha UAT pass</div><div class="row-sub">Week 17 — recruiters + TA leads validate</div></div></div>
+      <div class="row-item"><div class="row-icon" style="background:#EEEDFE;"><i class="ti ti-number-4" style="color:#534AB7;" aria-hidden="true"></i></div><div class="row-text"><div class="row-label">Beta go/no-go</div><div class="row-sub">Week 23 — exec + infosec production readiness</div></div></div>
+      <div class="row-item"><div class="row-icon" style="background:#e1f5ee;"><i class="ti ti-number-5" style="color:#0f6e56;" aria-hidden="true"></i></div><div class="row-text"><div class="row-label">Production launch</div><div class="row-sub">Week 28 — phased rollout, monitoring live</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div id="phases" class="rm-panel">
+  <div class="section-title">Phase 1 — Discovery & scoping <span class="tag tag-blue">Week 1–2</span></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><i class="ti ti-checklist" aria-hidden="true"></i> Deliverables</div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Problem statement document</div><div class="row-sub">Pain points from recruiters, TA leads, hiring managers</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Use case prioritisation matrix</div><div class="row-sub">Impact vs effort ranking of all AI features</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Data availability audit</div><div class="row-sub">What resume, JD, ATS data exists and in what format</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Compliance checklist</div><div class="row-sub">GDPR, data residency, bias-in-hiring regulations</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><i class="ti ti-users" aria-hidden="true"></i> Who's involved</div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Product Manager</div><div class="row-sub">Owns scope, interviews stakeholders</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">AI/ML Lead</div><div class="row-sub">Assesses feasibility of each use case</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">HR / Talent Acquisition lead</div><div class="row-sub">Domain expert, defines success metrics</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Legal / Compliance</div><div class="row-sub">Flags regulatory constraints early</div></div></div>
+    </div>
+  </div>
+
+  <div class="section-title">Phase 2 — POC <span class="tag tag-green">Week 3–8</span></div>
+  <div class="milestone"><div class="ms-week">Wk 3–4</div><div class="ms-dot" style="background:#2a78d6;"></div><div class="ms-text">Data pipeline: ingest sample resumes + JDs, clean, anonymise</div></div>
+  <div class="milestone"><div class="ms-week">Wk 4–5</div><div class="ms-dot" style="background:#2a78d6;"></div><div class="ms-text">CV screening prototype: prompt engineering + LLM scoring + manual eval</div></div>
+  <div class="milestone"><div class="ms-week">Wk 5–6</div><div class="ms-dot" style="background:#2a78d6;"></div><div class="ms-text">JD generator + interview question builder — first working demos</div></div>
+  <div class="milestone"><div class="ms-week">Wk 6–7</div><div class="ms-dot" style="background:#2a78d6;"></div><div class="ms-text">Recruiter copilot chat interface — basic RAG on internal docs</div></div>
+  <div class="milestone"><div class="ms-week">Wk 7–8</div><div class="ms-dot" style="background:#2a78d6;"></div><div class="ms-text">Internal demo to stakeholders — collect structured feedback</div></div>
+  <div class="milestone"><div class="ms-week">Wk 8</div><div class="ms-dot" style="background:#e90036;"></div><div class="ms-text" style="font-weight:500;">GATE: POC sign-off — HR head + CTO approval to proceed <span class="ms-badge" style="background:#fcebeb;color:#a32d2d;">Decision point</span></div></div>
+
+  <div class="section-title">Phase 3 — Approval & funding <span class="tag tag-amber">Week 9–11</span></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><i class="ti ti-file-description" aria-hidden="true"></i> Documents needed</div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Business case</div><div class="row-sub">ROI model: time-to-hire, cost-per-hire reduction targets</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">DPIA (Data Protection Impact Assessment)</div><div class="row-sub">Required if processing EU candidate data</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Bias risk assessment</div><div class="row-sub">AI fairness audit plan, human-in-the-loop design</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Vendor / API approval</div><div class="row-sub">Anthropic / OpenAI DPA, data processing agreements</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Budget request</div><div class="row-sub">Infra, API costs, headcount for full build</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><i class="ti ti-building-bank" aria-hidden="true"></i> Approvers</div>
+      <div class="row-item"><div class="row-text"><div class="row-label">CHRO / HR Director</div><div class="row-sub">Business case, HR process change sign-off</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">CTO / Engineering head</div><div class="row-sub">Technical architecture, security standards</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">DPO / Legal</div><div class="row-sub">GDPR, DPIA, vendor DPAs</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Finance</div><div class="row-sub">Budget approval, API cost projections</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">InfoSec</div><div class="row-sub">Data handling, model access controls</div></div></div>
+    </div>
+  </div>
+
+  <div class="section-title">Phase 4 — Alpha build <span class="tag tag-teal">Week 12–17</span></div>
+  <div class="milestone"><div class="ms-week">Wk 12–13</div><div class="ms-dot" style="background:#1baf7a;"></div><div class="ms-text">Production infra setup: cloud, vector DB, auth, logging</div></div>
+  <div class="milestone"><div class="ms-week">Wk 13–15</div><div class="ms-dot" style="background:#1baf7a;"></div><div class="ms-text">Core features built: CV screener, JD gen, interview builder, scorecard</div></div>
+  <div class="milestone"><div class="ms-week">Wk 15–16</div><div class="ms-dot" style="background:#1baf7a;"></div><div class="ms-text">ATS integration (Workday / Greenhouse / Lever), SSO</div></div>
+  <div class="milestone"><div class="ms-week">Wk 16–17</div><div class="ms-dot" style="background:#1baf7a;"></div><div class="ms-text">Internal UAT with 5–10 recruiters, fix critical bugs</div></div>
+  <div class="milestone"><div class="ms-week">Wk 17</div><div class="ms-dot" style="background:#e90036;"></div><div class="ms-text" style="font-weight:500;">GATE: Alpha UAT pass — TA leads sign off <span class="ms-badge" style="background:#fcebeb;color:#a32d2d;">Decision point</span></div></div>
+
+  <div class="section-title">Phase 5 — Beta <span class="tag tag-purple">Week 18–23</span></div>
+  <div class="milestone"><div class="ms-week">Wk 18–20</div><div class="ms-dot" style="background:#4a3aa7;"></div><div class="ms-text">Controlled rollout to one BU — monitor accuracy, latency, hallucination rate</div></div>
+  <div class="milestone"><div class="ms-week">Wk 20–21</div><div class="ms-dot" style="background:#4a3aa7;"></div><div class="ms-text">Bias audit on live outputs — third-party or internal fairness review</div></div>
+  <div class="milestone"><div class="ms-week">Wk 21–22</div><div class="ms-dot" style="background:#4a3aa7;"></div><div class="ms-text">Load testing, cost benchmarking, SLA validation</div></div>
+  <div class="milestone"><div class="ms-week">Wk 22–23</div><div class="ms-dot" style="background:#4a3aa7;"></div><div class="ms-text">Recruiter training, runbooks, admin dashboard</div></div>
+  <div class="milestone"><div class="ms-week">Wk 23</div><div class="ms-dot" style="background:#e90036;"></div><div class="ms-text" style="font-weight:500;">GATE: Beta go/no-go — exec + infosec production readiness <span class="ms-badge" style="background:#fcebeb;color:#a32d2d;">Decision point</span></div></div>
+
+  <div class="section-title">Phase 6 — Production launch <span class="tag tag-red">Week 24–28</span></div>
+  <div class="milestone"><div class="ms-week">Wk 24</div><div class="ms-dot" style="background:#e34948;"></div><div class="ms-text">Phased rollout — 20% of recruiting team first</div></div>
+  <div class="milestone"><div class="ms-week">Wk 25</div><div class="ms-dot" style="background:#e34948;"></div><div class="ms-text">Full rollout — all recruiters onboarded</div></div>
+  <div class="milestone"><div class="ms-week">Wk 26–28</div><div class="ms-dot" style="background:#e34948;"></div><div class="ms-text">Hypercare: daily monitoring, hotfix SLA 24hrs, weekly stakeholder report</div></div>
+</div>
+
+<div id="stack" class="rm-panel">
+  <div class="section-title">Core AI / LLM layer</div>
+  <div class="card" style="margin-bottom:12px;">
+    <div class="stack-item"><div class="stack-layer">LLM</div><div class="stack-name">Claude (Anthropic) or GPT-4o</div><div class="stack-why">CV parsing, scoring, JD gen, copilot chat — strong at structured extraction</div></div>
+    <div class="stack-item"><div class="stack-layer">Embeddings</div><div class="stack-name">text-embedding-3-large or Cohere embed-v3</div><div class="stack-why">Semantic search over resumes, JDs, candidate history</div></div>
+    <div class="stack-item"><div class="stack-layer">Orchestration</div><div class="stack-name">LangChain or LlamaIndex</div><div class="stack-why">RAG pipelines, tool chaining, memory across recruiter sessions</div></div>
+    <div class="stack-item"><div class="stack-layer">Vector DB</div><div class="stack-name">Pinecone or pgvector (Postgres)</div><div class="stack-why">Resume + JD semantic retrieval. pgvector if already on Postgres</div></div>
+    <div class="stack-item"><div class="stack-layer">Prompt mgmt</div><div class="stack-name">Langfuse or PromptLayer</div><div class="stack-why">Prompt versioning, A/B testing, output drift monitoring</div></div>
+  </div>
+
+  <div class="section-title">Backend & API</div>
+  <div class="card" style="margin-bottom:12px;">
+    <div class="stack-item"><div class="stack-layer">API</div><div class="stack-name">Python — FastAPI</div><div class="stack-why">Async, fast, native Python AI ecosystem compatibility</div></div>
+    <div class="stack-item"><div class="stack-layer">Queue</div><div class="stack-name">Celery + Redis</div><div class="stack-why">Async CV processing — don't block the UI on LLM calls</div></div>
+    <div class="stack-item"><div class="stack-layer">Document parse</div><div class="stack-name">PyMuPDF + python-docx</div><div class="stack-why">Extract clean text from PDF/DOCX resumes before LLM call</div></div>
+    <div class="stack-item"><div class="stack-layer">Database</div><div class="stack-name">PostgreSQL + SQLAlchemy</div><div class="stack-why">Candidate records, scores, audit trail, GDPR deletion hooks</div></div>
+    <div class="stack-item"><div class="stack-layer">Auth</div><div class="stack-name">OAuth 2.0 / SSO (SAML/OIDC)</div><div class="stack-why">Integrate with company IdP (Azure AD, Okta)</div></div>
+  </div>
+
+  <div class="section-title">Frontend</div>
+  <div class="card" style="margin-bottom:12px;">
+    <div class="stack-item"><div class="stack-layer">Framework</div><div class="stack-name">React + TypeScript + Vite</div><div class="stack-why">Component reuse, fast dev, good recruiter dashboard DX</div></div>
+    <div class="stack-item"><div class="stack-layer">UI library</div><div class="stack-name">shadcn/ui + Tailwind</div><div class="stack-why">Pre-built accessible components, fast to customise</div></div>
+    <div class="stack-item"><div class="stack-layer">State</div><div class="stack-name">Zustand or React Query</div><div class="stack-why">Server state sync, optimistic UI for recruiter actions</div></div>
+  </div>
+
+  <div class="section-title">Infrastructure & MLOps</div>
+  <div class="card" style="margin-bottom:12px;">
+    <div class="stack-item"><div class="stack-layer">Cloud</div><div class="stack-name">AWS or Azure (your org's existing cloud)</div><div class="stack-why">Data residency compliance; use existing enterprise agreements</div></div>
+    <div class="stack-item"><div class="stack-layer">Containers</div><div class="stack-name">Docker + Kubernetes (EKS/AKS)</div><div class="stack-why">Scalable deployment, zero-downtime updates</div></div>
+    <div class="stack-item"><div class="stack-layer">CI/CD</div><div class="stack-name">GitHub Actions</div><div class="stack-why">Automated test → build → deploy pipeline</div></div>
+    <div class="stack-item"><div class="stack-layer">Monitoring</div><div class="stack-name">Langfuse (AI) + Datadog or Grafana (infra)</div><div class="stack-why">LLM output quality, latency, token cost, hallucination rate</div></div>
+    <div class="stack-item"><div class="stack-layer">Secrets</div><div class="stack-name">AWS Secrets Manager / Azure Key Vault</div><div class="stack-why">API keys, DB credentials — never in code or env files</div></div>
+  </div>
+
+  <div class="section-title">ATS integrations</div>
+  <div class="card">
+    <div class="stack-item"><div class="stack-layer">Primary</div><div class="stack-name">Greenhouse, Lever, Workday, SAP SuccessFactors</div><div class="stack-why">Webhook + REST API for bidirectional candidate data sync</div></div>
+    <div class="stack-item"><div class="stack-layer">File ingestion</div><div class="stack-name">AWS S3 + Lambda trigger</div><div class="stack-why">Resumes uploaded → auto-processed pipeline trigger</div></div>
+  </div>
+</div>
+
+<div id="team" class="rm-panel">
+  <div class="section-title">Team composition</div>
+  <div class="resource-row head"><span>Role</span><span>POC</span><span>Alpha/Beta</span><span>Production</span></div>
+  <div class="resource-row"><span><strong>AI/ML Engineer (Python)</strong><br><span style="font-size:12px;color:var(--text-secondary);">LLM integration, prompt eng, RAG</span></span><span>1 FTE</span><span>2 FTE</span><span>1.5 FTE</span></div>
+  <div class="resource-row"><span><strong>Backend Engineer (Python)</strong><br><span style="font-size:12px;color:var(--text-secondary);">FastAPI, DB, queues, ATS integrations</span></span><span>1 FTE</span><span>2 FTE</span><span>1 FTE</span></div>
+  <div class="resource-row"><span><strong>Frontend Engineer</strong><br><span style="font-size:12px;color:var(--text-secondary);">React dashboard, recruiter UX</span></span><span>0.5 FTE</span><span>1 FTE</span><span>0.5 FTE</span></div>
+  <div class="resource-row"><span><strong>Product Manager</strong><br><span style="font-size:12px;color:var(--text-secondary);">Roadmap, stakeholders, UAT</span></span><span>0.5 FTE</span><span>1 FTE</span><span>0.5 FTE</span></div>
+  <div class="resource-row"><span><strong>DevOps / Cloud Engineer</strong><br><span style="font-size:12px;color:var(--text-secondary);">Infra, CI/CD, monitoring, security</span></span><span>0.25 FTE</span><span>1 FTE</span><span>0.5 FTE</span></div>
+  <div class="resource-row"><span><strong>QA / Test Engineer</strong><br><span style="font-size:12px;color:var(--text-secondary);">Bias testing, UAT coordination, regression</span></span><span>—</span><span>1 FTE</span><span>0.5 FTE</span></div>
+  <div class="resource-row"><span><strong>HR domain expert</strong><br><span style="font-size:12px;color:var(--text-secondary);">Eval data labelling, validation, training</span></span><span>0.25 FTE</span><span>0.5 FTE</span><span>0.25 FTE</span></div>
+
+  <div class="section-title" style="margin-top:1.5rem;">Budget estimates (indicative)</div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><i class="ti ti-cpu" aria-hidden="true"></i> API & infra costs / month</div>
+      <div class="row-item"><div class="row-text"><div class="row-label">LLM API (Claude / GPT-4o)</div><div class="row-sub">~500–2,000 CV/day × $0.01–0.05 per CV = $150–3,000/mo</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Vector DB (Pinecone)</div><div class="row-sub">~$70–200/mo for 1M vectors</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Cloud infra (AWS/Azure)</div><div class="row-sub">~$500–2,000/mo (compute, storage, queues)</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Monitoring (Langfuse + Datadog)</div><div class="row-sub">~$100–400/mo</div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><i class="ti ti-chart-bar" aria-hidden="true"></i> Success KPIs to track</div>
+      <div class="row-item"><div class="row-text"><div class="row-label">CV screening accuracy</div><div class="row-sub">Target: &gt;85% match with human shortlist</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Time-to-shortlist reduction</div><div class="row-sub">Target: &gt;60% faster than manual</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Recruiter NPS</div><div class="row-sub">Target: &gt;40 within 3 months of launch</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Hallucination rate</div><div class="row-sub">Target: &lt;2% on structured outputs</div></div></div>
+      <div class="row-item"><div class="row-text"><div class="row-label">Bias audit pass rate</div><div class="row-sub">Target: 0 disparate impact violations</div></div></div>
+    </div>
+  </div>
+</div>
+
+<div id="risks" class="rm-panel">
+  <div class="section-title">Top risks and mitigations</div>
+  <div class="risk-row head"><span>Risk</span><span>Severity</span><span>Mitigation</span></div>
+  <div class="risk-row"><span><strong>Bias in CV screening</strong> — model discriminates by gender, name, university</span><span><div class="sev sev-h">High</div></span><span>Anonymise resumes before LLM call; mandatory bias audit before beta; human-in-the-loop for final shortlist</span></div>
+  <div class="risk-row"><span><strong>GDPR / data privacy</strong> — candidate PII sent to third-party LLM API</span><span><div class="sev sev-h">High</div></span><span>Sign DPA with Anthropic/OpenAI; anonymise before API call; use EU data residency endpoints; DPO sign-off</span></div>
+  <div class="risk-row"><span><strong>LLM hallucination on scorecards</strong> — fabricated candidate attributes</span><span><div class="sev sev-h">High</div></span><span>JSON schema validation on all outputs; confidence scoring; human review for any flagged outputs</span></div>
+  <div class="risk-row"><span><strong>ATS integration failure</strong> — Workday / Greenhouse API changes break pipeline</span><span><div class="sev sev-m">Medium</div></span><span>Versioned API contracts; webhook fallback; integration tests in CI/CD</span></div>
+  <div class="risk-row"><span><strong>Stakeholder resistance from recruiters</strong> — fear of job replacement</span><span><div class="sev sev-m">Medium</div></span><span>Frame as copilot not replacement; involve recruiters in UAT design; show time saved per week</span></div>
+  <div class="risk-row"><span><strong>API cost overrun</strong> — more CVs than estimated at launch</span><span><div class="sev sev-m">Medium</div></span><span>Per-role token budgets; caching for repeat queries; cost alerts at 80% of monthly budget</span></div>
+  <div class="risk-row"><span><strong>Prompt drift</strong> — LLM behaviour changes after model update</span><span><div class="sev sev-m">Medium</div></span><span>Langfuse prompt versioning; regression test suite on golden eval set; pin model versions</span></div>
+  <div class="risk-row"><span><strong>Scope creep in alpha</strong> — stakeholders add features mid-build</span><span><div class="sev sev-l">Low</div></span><span>Strict change control after Phase 3 approval; new requests go to backlog v2</span></div>
+
+  <div class="section-title" style="margin-top:1.5rem;">Legal & compliance checklist</div>
+  <div class="card">
+    <div class="row-item"><div class="row-icon" style="background:#eaf3de;"><i class="ti ti-check" style="color:#3b6d11;" aria-hidden="true"></i></div><div class="row-text"><div class="row-label">GDPR Article 22 — automated decision-making</div><div class="row-sub">AI screening must be advisory only; candidates must be able to request human review</div></div></div>
+    <div class="row-item"><div class="row-icon" style="background:#eaf3de;"><i class="ti ti-check" style="color:#3b6d11;" aria-hidden="true"></i></div><div class="row-text"><div class="row-label">EU AI Act — high-risk system classification</div><div class="row-sub">Recruitment AI may be classified high-risk; requires transparency, logging, human oversight</div></div></div>
+    <div class="row-item"><div class="row-icon" style="background:#eaf3de;"><i class="ti ti-check" style="color:#3b6d11;" aria-hidden="true"></i></div><div class="row-text"><div class="row-label">Data Processing Agreement with LLM vendor</div><div class="row-sub">Anthropic / OpenAI DPA must be signed before any candidate data hits the API</div></div></div>
+    <div class="row-item"><div class="row-icon" style="background:#eaf3de;"><i class="ti ti-check" style="color:#3b6d11;" aria-hidden="true"></i></div><div class="row-text"><div class="row-label">Candidate transparency notice</div><div class="row-sub">Privacy policy must disclose that AI is used in screening</div></div></div>
+    <div class="row-item"><div class="row-icon" style="background:#eaf3de;"><i class="ti ti-check" style="color:#3b6d11;" aria-hidden="true"></i></div><div class="row-text"><div class="row-label">Audit trail retention</div><div class="row-sub">All AI decisions logged with inputs/outputs for minimum 12 months</div></div></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.rm-panel').forEach(p => p.classList.remove('show'));
+  document.querySelectorAll('.rm-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('show');
+  const tabs = { overview:0, phases:1, stack:2, team:3, risks:4 };
+  document.querySelectorAll('.rm-tab')[tabs[id]].classList.add('active');
+}
+</script>

@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InterviewIQ — AI Interview Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:      #0D0F14;
+    --ink-2:    #3A3E4A;
+    --ink-3:    #6B7080;
+    --rule:     #E4E6ED;
+    --surface:  #F7F8FA;
+    --white:    #FFFFFF;
+    --accent:   #2D5BE3;
+    --accent-lt:#EEF2FD;
+    --warn:     #E85C2B;
+    --teal:     #0F8B6C;
+    --teal-lt:  #E6F5F1;
+    --amber:    #C47A0E;
+    --amber-lt: #FEF5E4;
+  }
+
+  html { font-size: 16px; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--white);
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--ink);
+    color: var(--white);
+    padding: 64px 48px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 420px; height: 420px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.12;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 30%;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: var(--teal);
+    opacity: 0.10;
+  }
+  .hero-inner { position: relative; max-width: 860px; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: rgba(255,255,255,0.55);
+    margin-bottom: 20px;
+  }
+  .hero-eyebrow span {
+    display: inline-block; width: 24px; height: 1px;
+    background: rgba(255,255,255,0.35);
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 5vw, 60px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.5);
+  }
+  .hero-desc {
+    font-size: 17px; font-weight: 300;
+    color: rgba(255,255,255,0.72);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 36px;
+  }
+  .hero-stats {
+    display: flex; gap: 40px; flex-wrap: wrap;
+  }
+  .stat-item {}
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 32px; font-weight: 700;
+    color: var(--white);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 12px; font-weight: 400;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+  }
+  .stat-divider {
+    width: 1px; background: rgba(255,255,255,0.15);
+    align-self: stretch;
+  }
+
+  /* ── BODY LAYOUT ── */
+  .page { max-width: 860px; margin: 0 auto; padding: 0 48px 80px; }
+
+  /* ── SECTION HEADER ── */
+  .sec-header {
+    display: flex; align-items: baseline; gap: 14px;
+    padding: 48px 0 24px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 32px;
+  }
+  .sec-tag {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent);
+    background: var(--accent-lt);
+    padding: 3px 8px; border-radius: 4px;
+    white-space: nowrap;
+  }
+  .sec-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--ink); letter-spacing: -0.01em;
+  }
+
+  /* ── PROBLEM ── */
+  .problem-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px; margin-bottom: 8px;
+  }
+  .problem-card {
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 20px;
+    background: var(--surface);
+  }
+  .problem-icon {
+    font-size: 20px; margin-bottom: 10px;
+    display: block;
+  }
+  .problem-card h4 {
+    font-size: 13px; font-weight: 600; color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .problem-card p {
+    font-size: 12.5px; color: var(--ink-3); line-height: 1.55;
+  }
+
+  /* ── WHAT IT IS ── */
+  .what-box {
+    background: var(--accent-lt);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .what-box p {
+    font-size: 15.5px; color: var(--ink-2); line-height: 1.7;
+  }
+  .what-box strong { color: var(--ink); font-weight: 600; }
+
+  /* ── SCOPE TABLE ── */
+  .scope-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .scope-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 16px 18px;
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    background: var(--white);
+    transition: border-color 0.2s;
+  }
+  .scope-item:hover { border-color: #B0BDF8; }
+  .scope-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 6px;
+  }
+  .scope-item h4 { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+  .scope-item p  { font-size: 12px; color: var(--ink-3); line-height: 1.5; }
+
+  /* ── FEATURES ── */
+  .feature-cols {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+  }
+  .feature-card {
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid var(--rule);
+  }
+  .feature-card .fc-badge {
+    display: inline-block;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 4px;
+    margin-bottom: 12px;
+  }
+  .feature-card h4 { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .feature-card ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .feature-card ul li {
+    font-size: 12px; color: var(--ink-2);
+    padding-left: 14px; position: relative; line-height: 1.5;
+  }
+  .feature-card ul li::before {
+    content: '–'; position: absolute; left: 0;
+    color: var(--ink-3);
+  }
+
+  /* ── PROCTORING ── */
+  .proctor-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  }
+  .proctor-card {
+    background: #FDF3EF;
+    border: 1px solid #F7CEBA;
+    border-radius: 10px; padding: 16px;
+    text-align: center;
+  }
+  .proctor-card .pc-icon { font-size: 22px; margin-bottom: 8px; display: block; }
+  .proctor-card h4 { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .proctor-card p  { font-size: 11px; color: var(--ink-3); line-height: 1.4; }
+
+  /* ── VERDICT ── */
+  .verdict-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    margin-bottom: 14px;
+  }
+  .verdict-card {
+    border-radius: 10px; padding: 20px;
+    border: 1px solid var(--rule);
+  }
+  .verdict-card h4 { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
+  .verdict-card ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .verdict-card ul li {
+    font-size: 12px; color: var(--ink-2);
+    display: flex; gap: 8px; align-items: flex-start; line-height: 1.5;
+  }
+  .verdict-card ul li::before { content: '✓'; color: var(--teal); font-weight: 600; flex-shrink: 0; }
+
+  .verdict-tiers {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  }
+  .tier {
+    border-radius: 8px; padding: 14px 12px; text-align: center;
+    border: 1px solid var(--rule);
+  }
+  .tier .tier-label { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .tier .tier-desc  { font-size: 11px; color: var(--ink-3); }
+  .tier-sh { background: #E6F5F1; border-color: #9FE1CB; }
+  .tier-sh .tier-label { color: var(--teal); }
+  .tier-h  { background: #EEF2FD; border-color: #B0BDF8; }
+  .tier-h  .tier-label { color: var(--accent); }
+  .tier-m  { background: var(--amber-lt); border-color: #F5C974; }
+  .tier-m  .tier-label { color: var(--amber); }
+  .tier-r  { background: #FEF0ED; border-color: #F7CEBA; }
+  .tier-r  .tier-label { color: var(--warn); }
+
+  /* ── TECH STACK ── */
+  .tech-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  .tech-pill {
+    font-size: 12px; font-weight: 500; color: var(--ink-2);
+    background: var(--surface); border: 1px solid var(--rule);
+    padding: 5px 12px; border-radius: 20px;
+  }
+  .tech-group-label {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--ink-3);
+    margin-bottom: 8px; margin-top: 20px;
+  }
+
+  /* ── NEXT STEPS ── */
+  .steps-list { counter-reset: steps; display: flex; flex-direction: column; gap: 0; }
+  .step-item {
+    display: flex; gap: 20px; align-items: flex-start;
+    padding: 20px 0; border-bottom: 1px solid var(--rule);
+  }
+  .step-item:last-child { border-bottom: none; }
+  .step-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px; font-weight: 800;
+    color: var(--rule); line-height: 1; flex-shrink: 0;
+    width: 36px;
+  }
+  .step-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .step-body p  { font-size: 13px; color: var(--ink-3); line-height: 1.55; }
+  .step-tag {
+    display: inline-block; margin-top: 6px;
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.07em; padding: 2px 7px; border-radius: 4px;
+  }
+
+  /* ── INTERVIEW NINJA INTEGRATION ── */
+  .ninja-banner {
+    background: var(--ink);
+    border-radius: 12px;
+    padding: 28px 32px;
+    display: flex; align-items: center; gap: 24px;
+    margin-bottom: 28px;
+    position: relative; overflow: hidden;
+  }
+  .ninja-banner::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: var(--teal); opacity: 0.12;
+  }
+  .ninja-logo-box {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 12px 18px;
+    flex-shrink: 0;
+    text-align: center;
+  }
+  .ninja-logo-box .nl-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 800;
+    color: var(--white); letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .ninja-logo-box .nl-sub {
+    font-size: 10px; color: rgba(255,255,255,0.45);
+    font-weight: 400; margin-top: 3px;
+  }
+  .ninja-banner-text h3 {
+    font-size: 15px; font-weight: 600;
+    color: var(--white); margin-bottom: 5px;
+  }
+  .ninja-banner-text p {
+    font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.55;
+  }
+  .ninja-flow {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 0; align-items: stretch; margin-bottom: 24px;
+  }
+  .ninja-box {
+    border: 1px solid var(--rule);
+    border-radius: 10px; padding: 20px;
+    background: var(--white);
+  }
+  .ninja-box.iq { border-color: #B0BDF8; background: var(--accent-lt); }
+  .ninja-box h4 {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--ink-3);
+    margin-bottom: 12px;
+  }
+  .ninja-box.iq h4 { color: var(--accent); }
+  .ninja-box ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .ninja-box ul li {
+    font-size: 12.5px; color: var(--ink-2); line-height: 1.45;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .ninja-box ul li .li-icon { flex-shrink: 0; font-size: 13px; margin-top: 1px; }
+  .ninja-arrows {
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    gap: 12px; padding: 0 16px;
+  }
+  .arr-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .arr-line {
+    width: 48px; height: 1px;
+    display: flex; align-items: center; position: relative;
+  }
+  .arr-pull { background: var(--teal); }
+  .arr-push { background: var(--accent); }
+  .arr-line::after {
+    content: '›'; position: absolute; right: -2px;
+    font-size: 14px; line-height: 1;
+  }
+  .arr-pull::after { color: var(--teal); }
+  .arr-push::after { color: var(--accent); }
+  .arr-pull-rev::before {
+    content: '‹'; position: absolute; left: -2px;
+    font-size: 14px; line-height: 1; color: var(--teal);
+  }
+  .arr-label {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; white-space: nowrap;
+  }
+  .arr-pull .arr-label, .lbl-pull { color: var(--teal); }
+  .lbl-push { color: var(--accent); }
+  .ninja-note {
+    background: var(--teal-lt);
+    border: 1px solid #9FE1CB;
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 12.5px; color: #085041; line-height: 1.6;
+  }
+  .ninja-note strong { font-weight: 600; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--ink); color: rgba(255,255,255,0.5);
+    padding: 24px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .footer strong { color: rgba(255,255,255,0.85); }
+
+  @media (max-width: 680px) {
+    .hero { padding: 40px 24px 36px; }
+    .page { padding: 0 24px 60px; }
+    .problem-grid, .feature-cols, .proctor-grid, .verdict-tiers { grid-template-columns: 1fr; }
+    .scope-grid, .verdict-row { grid-template-columns: 1fr; }
+    .ninja-flow { grid-template-columns: 1fr; }
+    .ninja-arrows { flex-direction: row; padding: 8px 0; }
+    .ninja-banner { flex-direction: column; gap: 16px; }
+    .hero-stats { gap: 24px; }
+    .footer { padding: 20px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ HERO ══════════════ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow"><span></span> Wissen — Product Concept</div>
+    <h1>The interview that<br>thinks as fast as<br><em>you do</em></h1>
+    <p class="hero-desc">
+      An AI-powered interview agent that runs natively inside Microsoft Teams — conducting, proctoring, scoring, and deciding, all in one session.
+    </p>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">3-in-1</div>
+        <div class="stat-label">Test + R1 + R2 in one round</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">AI-conducted &amp; proctored</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-num">&lt; 5 min</div>
+        <div class="stat-label">Recruiter time per candidate</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Scheduling back-and-forth</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════ BODY ══════════════ -->
+<main class="page">
+
+  <!-- PROBLEM -->
+  <section>
+    <div class="sec-header">
+      <span class="sec-tag">The problem</span>
+      <span class="sec-title">Current hiring is slow, inconsistent, and gameable</span>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <span class="problem-icon">⏱</span>
+        <h4>3–5 weeks per hire</h4>
+        <p>Coordinating test, R1, and R2 across schedules burns recruiter and interviewer time before a single question is asked.</p>
+      </div>
+      <div class="problem-card">
+        <span class="problem-icon">⚖️</span>
+        <h4>Inconsistent evaluation</h4>
+        <p>Different interviewers ask different questions. Scoring is subjective. Feedback varies wildly across panels.</p>
+      </div>
+      <div class="problem-card">
+        <span class="problem-icon">🎭</span>
+        <h4>Integrity at risk</h4>
+        <p>Candidates use ChatGPT, coaching calls, and tab-switching freely. No current tool catches this in a Teams call.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT IT IS -->
+  <section>
+    <div class="sec-header">
+      <span class="sec-tag">The solution</span>
+      <span class="sec-title">What InterviewIQ does</span>
+    </div>
+    <div class="what-box">
+      <p>
+        <strong>InterviewIQ is an AI agent that joins your Microsoft Teams call as a participant.</strong> It reads the job description and candidate profile, generates a tailored question bank, conducts a seamless Test + R1 + R2 interview via voice, monitors the candidate's screen, webcam, and audio for integrity signals in real time, and delivers a structured <strong>hire / reject verdict with a full scorecard</strong> the moment the session ends — without a human interviewer in the room.
+      </p>
+    </div>
+  </section>
+
+  <!-- DISCOVERY & SCOPING -->
+  <section>
+    <div class="sec-header">
+      <span class="sec-tag">Discovery &amp; scoping</span>
+      <span class="sec-title">What we're building and what's in scope</span>
+    </div>
+    <div class="scope-grid">
+      <div class="scope-item">
+        <div class="scope-dot" style="background: var(--accent);"></div>
+        <div>
+          <h4>JD &amp; profile ingestion</h4>
+          <p>Upload or paste any JD and résumé. AI extracts skills, seniority, domain, and gap areas to define the interview focus automatically.</p>
+        </div>
+      </div>
+      <div class="scope-item">
+        <div class="scope-dot" style="background: var(--accent);"></div>
+        <div>
+          <h4>Adaptive question engine</h4>
+          <p>Pre-generates a question bank and selects the next question based on the candidate's last answer — not a fixed script.</p>
+        </div>
+      </div>
+      <div class="scope-item">
+        <div class="scope-dot" style="background: var(--teal);"></div>
+        <div>
+          <h4>Teams bot integration</h4>
+          <p>Bot joins as a call participant via Microsoft Graph API. Speaks questions using Azure TTS, listens and transcribes via Azure STT.</p>
+        </div>
+      </div>
+      <div class="scope-item">
+        <div class="scope-dot" style="background: var(--teal);"></div>
+        <div>
+          <h4>Screen share analysis</h4>
+          <p>Receives and analyses the candidate's screen share. OCR detects open apps, URLs, and blocked tools in real time.</p>
+        </div>
+      </div>
+      <div class="scope-item">
+        <div class="scope-dot" style="background: var(--warn);"></div>
+        <div>
+          <h4>Eye &amp; face proctoring</h4>
+          <p>Webcam feed tracked via MediaPipe. Detects gaze direction, face absence, multiple people, and lip-sync mismatches.</p>
+        </div>
+      </div>
+      <div class="scope-item">
+        <div class="scope-dot" style="background: var(--warn);"></div>
+        <div>
+          <h4>Audio integrity monitoring</h4>
+          <p>Background voice detection, earphone heuristics, and keystroke-while-speaking signals flag coaching attempts in real time.</p>
+        </div>
+      </div>
+      <div class="scope-item">
+        <div class="scope-dot" style="background: var(--amber);"></div>
+        <div>
+          <h4>Real-time scoring engine</h4>
+          <p>Every answer scored against a pre-built rubric — STAR adherence, technical accuracy, communication clarity, confidence signals.</p>
+        </div>
+      </div>
+      <div class="scope-item">
+        <div class="scope-dot" style="background: var(--amber);"></div>
+        <div>
+          <h4>Verdict &amp; report generation</h4>
+          <p>Hire / reject verdict with scorecard, transcript highlights, integrity log, radar chart, and one-click ATS export.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section>
+    <div class="sec-header">
+      <span class="sec-tag">Core features</span>
+      <span class="sec-title">Three pillars of the product</span>
+    </div>
+    <div class="feature-cols">
+      <div class="feature-card">
+        <span class="fc-badge" style="background: var(--accent-lt); color: var(--accent);">Intelligence</span>
+        <h4>Adaptive interview engine</h4>
+        <ul>
+          <li>Reads JD &amp; résumé to set focus areas</li>
+          <li>Pre-generates 40–60 question bank</li>
+          <li>Selects next question from last answer</li>
+          <li>Probes weak answers with follow-ups</li>
+          <li>Manages time budgets per section</li>
+          <li>Bias-audits all questions before session</li>
+        </ul>
+      </div>
+      <div class="feature-card">
+        <span class="fc-badge" style="background: #FDF3EF; color: var(--warn);">Integrity</span>
+        <h4>360° proctoring</h4>
+        <ul>
+          <li>Screen OCR with app &amp; URL classifier</li>
+          <li>Eye gaze zone tracking (webcam)</li>
+          <li>Face count &amp; absence detection</li>
+          <li>Background voice &amp; coaching detection</li>
+          <li>Copy-paste &amp; AI-text detection</li>
+          <li>3-strike verbal warning system</li>
+        </ul>
+      </div>
+      <div class="feature-card">
+        <span class="fc-badge" style="background: var(--teal-lt); color: var(--teal);">Insights</span>
+        <h4>Verdict &amp; reporting</h4>
+        <ul>
+          <li>Composite score across 4 dimensions</li>
+          <li>Hire / Strong hire / Marginal / Reject</li>
+          <li>Full transcript with AI commentary</li>
+          <li>Radar chart + integrity flag log</li>
+          <li>Cohort benchmark comparison</li>
+          <li>ATS export — Greenhouse &amp; Lever</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCTORING SIGNALS -->
+  <section>
+    <div class="sec-header">
+      <span class="sec-tag">Anti-cheat</span>
+      <span class="sec-title">What the proctoring layer monitors</span>
+    </div>
+    <div class="proctor-grid">
+      <div class="proctor-card">
+        <span class="pc-icon">👁</span>
+        <h4>Eye tracking</h4>
+        <p>Gaze zone map — sustained off-screen gaze flagged after 3s</p>
+      </div>
+      <div class="proctor-card">
+        <span class="pc-icon">🖥</span>
+        <h4>Screen analysis</h4>
+        <p>OCR detects ChatGPT, browser tabs, blocked URLs in real time</p>
+      </div>
+      <div class="proctor-card">
+        <span class="pc-icon">🎙</span>
+        <h4>Audio monitoring</h4>
+        <p>Background voices, whispered coaching, audio-gap anomalies</p>
+      </div>
+      <div class="proctor-card">
+        <span class="pc-icon">📋</span>
+        <h4>Answer integrity</h4>
+        <p>Copy-paste detection, AI-text classifier, vocabulary drift</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VERDICT -->
+  <section>
+    <div class="sec-header">
+      <span class="sec-tag">Output</span>
+      <span class="sec-title">What the recruiter receives</span>
+    </div>
+    <div class="verdict-row">
+      <div class="verdict-card">
+        <h4>Scorecard parameters</h4>
+        <ul>
+          <li>Technical accuracy &amp; topic breakdown</li>
+          <li>Behavioural fit — STAR structure</li>
+          <li>Communication clarity &amp; vocabulary</li>
+          <li>Confidence signals &amp; response latency</li>
+          <li>Integrity index — flags with evidence</li>
+          <li>Cohort benchmark percentile</li>
+        </ul>
+      </div>
+      <div class="verdict-card">
+        <h4>Report sections</h4>
+        <ul>
+          <li>Executive summary — 1 verdict, 3 strengths, 3 concerns</li>
+          <li>Full transcript with AI commentary per answer</li>
+          <li>Radar chart across all 5 dimensions</li>
+          <li>Integrity flag timeline with screenshots</li>
+          <li>Recruiter override &amp; manual note option</li>
+          <li>One-click ATS push</li>
+        </ul>
+      </div>
+    </div>
+    <div class="verdict-tiers">
+      <div class="tier tier-sh">
+        <div class="tier-label">Strong Hire</div>
+        <div class="tier-desc">Exceptional across all parameters</div>
+      </div>
+      <div class="tier tier-h">
+        <div class="tier-label">Hire</div>
+        <div class="tier-desc">Meets bar with no major gaps</div>
+      </div>
+      <div class="tier tier-m">
+        <div class="tier-label">Marginal</div>
+        <div class="tier-desc">Human review recommended</div>
+      </div>
+      <div class="tier tier-r">
+        <div class="tier-label">Reject</div>
+        <div class="tier-desc">Does not meet minimum bar</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERVIEW NINJA INTEGRATION -->
+  <section>
+    <div class="sec-header">
+      <span class="sec-tag">Existing platform</span>
+      <span class="sec-title">Interview Ninja integration</span>
+    </div>
+
+    <div class="ninja-banner">
+      <div class="ninja-logo-box">
+        <div class="nl-title">Interview<br>Ninja</div>
+        <div class="nl-sub">Existing portal</div>
+      </div>
+      <div class="ninja-banner-text">
+        <h3>InterviewIQ plugs directly into Interview Ninja — your existing interview management portal</h3>
+        <p>Interview Ninja already holds role templates, curated question banks, answer guidelines, and scoring rubrics built by your team. InterviewIQ reads these automatically at session start, uses them to conduct the interview, and writes results back — so nothing is re-entered manually and everything appears in Interview Ninja as if an interviewer filled it in.</p>
+      </div>
+    </div>
+
+    <div class="ninja-flow">
+
+      <!-- Interview Ninja side -->
+      <div class="ninja-box">
+        <h4>Interview Ninja provides →</h4>
+        <ul>
+          <li><span class="li-icon">📋</span>Role-specific question templates per job</li>
+          <li><span class="li-icon">✅</span>Expected answers &amp; answer guidelines per question</li>
+          <li><span class="li-icon">⭐</span>Scoring rubric — weightage per question</li>
+          <li><span class="li-icon">🔒</span>Authenticity &amp; integrity scoring criteria</li>
+          <li><span class="li-icon">👤</span>Candidate record &amp; session metadata</li>
+        </ul>
+      </div>
+
+      <!-- Arrows -->
+      <div class="ninja-arrows">
+        <div class="arr-item">
+          <div class="arr-line arr-pull" style="background: var(--teal);"></div>
+          <span class="arr-label lbl-pull">Pull at session start</span>
+        </div>
+        <div style="width:1px; height:20px; background: var(--rule);"></div>
+        <div class="arr-item">
+          <div class="arr-line arr-push" style="background: var(--accent); transform: scaleX(-1);"></div>
+          <span class="arr-label lbl-push">Push on session end</span>
+        </div>
+      </div>
+
+      <!-- InterviewIQ side -->
+      <div class="ninja-box iq">
+        <h4>InterviewIQ writes back →</h4>
+        <ul>
+          <li><span class="li-icon">🎙</span>Candidate answer transcript per question</li>
+          <li><span class="li-icon">📊</span>AI-generated score mapped to Ninja's rubric</li>
+          <li><span class="li-icon">🚩</span>Integrity flags against authenticity fields</li>
+          <li><span class="li-icon">💬</span>AI commentary per answer (as interviewer notes)</li>
+          <li><span class="li-icon">🏆</span>Overall verdict synced to candidate record</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="ninja-note">
+      <strong>No duplicate data entry.</strong> Interviewers who currently fill Interview Ninja manually will find the same fields auto-populated after every AI-conducted session. The recruiter can review, add a note, or override any field — Interview Ninja remains the single source of truth for all interview records.
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section>
+    <div class="sec-header">
+      <span class="sec-tag">Technology</span>
+      <span class="sec-title">Built on Azure &amp; Microsoft ecosystem</span>
+    </div>
+    <div class="tech-group-label">AI &amp; Language</div>
+    <div class="tech-row">
+      <span class="tech-pill">GPT-4o</span>
+      <span class="tech-pill">LangChain</span>
+      <span class="tech-pill">Azure OpenAI</span>
+      <span class="tech-pill">Azure Cognitive Speech (TTS / STT)</span>
+      <span class="tech-pill">Whisper</span>
+    </div>
+    <div class="tech-group-label">Proctoring &amp; Vision</div>
+    <div class="tech-row">
+      <span class="tech-pill">MediaPipe FaceMesh</span>
+      <span class="tech-pill">Azure Computer Vision</span>
+      <span class="tech-pill">Azure Form Recognizer (OCR)</span>
+      <span class="tech-pill">WebGazer.js</span>
+    </div>
+    <div class="tech-group-label">Platform &amp; Integration</div>
+    <div class="tech-row">
+      <span class="tech-pill">Microsoft Teams Bot Framework</span>
+      <span class="tech-pill">Azure Graph API</span>
+      <span class="tech-pill">Azure Kubernetes Service</span>
+      <span class="tech-pill">Azure Service Bus</span>
+      <span class="tech-pill">Azure Cosmos DB</span>
+      <span class="tech-pill">Azure AI Search</span>
+    </div>
+    <div class="tech-group-label">Frontend &amp; Reporting</div>
+    <div class="tech-row">
+      <span class="tech-pill">Next.js</span>
+      <span class="tech-pill">Power BI Embedded</span>
+      <span class="tech-pill">Greenhouse / Lever API</span>
+    </div>
+    <div class="tech-group-label">Interview Ninja integration</div>
+    <div class="tech-row">
+      <span class="tech-pill" style="border-color: #9FE1CB; color: var(--teal); background: var(--teal-lt);">Interview Ninja REST API</span>
+      <span class="tech-pill" style="border-color: #9FE1CB; color: var(--teal); background: var(--teal-lt);">Template sync — session start</span>
+      <span class="tech-pill" style="border-color: #9FE1CB; color: var(--teal); background: var(--teal-lt);">Result write-back — session end</span>
+      <span class="tech-pill" style="border-color: #9FE1CB; color: var(--teal); background: var(--teal-lt);">Webhook / event-driven push</span>
+    </div>
+  </section>
+
+  <!-- NEXT STEPS -->
+  <section>
+    <div class="sec-header">
+      <span class="sec-tag">Discovery &amp; scoping — next steps</span>
+      <span class="sec-title">Proposed phased rollout</span>
+    </div>
+    <div class="steps-list">
+      <div class="step-item">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <h4>Discovery &amp; requirements (Weeks 1–2)</h4>
+          <p>Stakeholder alignment, recruiter workflow mapping, compliance &amp; data privacy review, ATS integration scoping, and definition of success metrics.</p>
+          <span class="step-tag" style="background: var(--accent-lt); color: var(--accent);">In scope now</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <h4>Proof of concept — Teams bot + question engine (Weeks 3–6)</h4>
+          <p>Build and validate the core loop: bot joins call, asks adaptive questions from a JD, transcribes answers, and generates a basic scorecard. One role, one domain.</p>
+          <span class="step-tag" style="background: var(--teal-lt); color: var(--teal);">Phase 1</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <h4>Proctoring integration (Weeks 7–10)</h4>
+          <p>Add screen share analysis, eye tracking, audio monitoring, and the 3-strike warning engine. Internal pilot with 10 volunteer candidates.</p>
+          <span class="step-tag" style="background: var(--teal-lt); color: var(--teal);">Phase 2</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">04</div>
+        <div class="step-body">
+          <h4>Verdict engine &amp; reporting (Weeks 11–14)</h4>
+          <p>Build composite scoring, verdict tiers, detailed report, radar chart, and ATS export. Calibrate scoring weights against historical hire data.</p>
+          <span class="step-tag" style="background: var(--amber-lt); color: var(--amber);">Phase 3</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">05</div>
+        <div class="step-body">
+          <h4>Controlled rollout &amp; calibration (Weeks 15–20)</h4>
+          <p>Live deployment for one business unit. Parallel human interviews run alongside AI for 4 weeks to validate accuracy. Iterate on rubric and scoring weights.</p>
+          <span class="step-tag" style="background: #FEF0ED; color: var(--warn);">Phase 4</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div><strong>InterviewIQ</strong> — AI Interview Agent &nbsp;·&nbsp; Wissen Internal Concept</div>
+  <div>Prepared by Sudarshan Garg for ED review &nbsp;·&nbsp; Confidential</div>
+</footer>
+
+</body>
+</html>
