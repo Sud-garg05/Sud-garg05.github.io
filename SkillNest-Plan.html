@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillNest · The DSR Parkway Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue: oklch(0.44 0.16 262);
+    --blue-deep: oklch(0.32 0.11 264);
+    --blue-deeper: oklch(0.26 0.08 265);
+    --blue-tint: oklch(0.955 0.015 258);
+    --blue-tint-2: oklch(0.92 0.03 258);
+    --ink: oklch(0.24 0.025 264);
+    --ink-soft: oklch(0.45 0.02 262);
+    --paper: oklch(0.988 0.004 250);
+    --saffron: oklch(0.78 0.14 75);
+    --saffron-deep: oklch(0.65 0.15 60);
+    --line: oklch(0.88 0.012 258);
+    --on-blue: oklch(0.97 0.008 255);
+    --on-blue-soft: oklch(0.82 0.035 258);
+    --display: "Bricolage Grotesque", sans-serif;
+    --body: "Figtree", sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--body);
+    color:var(--ink);
+    background:var(--paper);
+    line-height:1.6;
+    font-size:17px;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--saffron);color:var(--ink)}
+
+  .wrap{max-width:1060px;margin:0 auto;padding:0 clamp(20px,5vw,48px)}
+
+  h1,h2,h3{font-family:var(--display);line-height:1.06;letter-spacing:-0.02em}
+  h2{font-size:clamp(30px,4.6vw,46px);font-weight:700}
+  h3{font-size:clamp(19px,2.2vw,23px);font-weight:600;letter-spacing:-0.01em}
+  p{max-width:68ch}
+  strong{font-weight:700}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:
+      radial-gradient(1200px 600px at 85% -10%, oklch(0.5 0.17 258 / .55), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, oklch(0.38 0.14 275 / .5), transparent 55%),
+      var(--blue-deep);
+    color:var(--on-blue);
+    padding:clamp(56px,9vw,110px) 0 clamp(64px,9vw,120px);
+    position:relative;overflow:hidden;
+  }
+  .brandline{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:clamp(48px,8vw,96px)}
+  .wordmark{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-0.02em}
+  .wordmark .nest{color:var(--saffron)}
+  .brandline small{font-size:14px;color:var(--on-blue-soft);font-weight:500}
+  .hero h1{font-size:clamp(44px,8.2vw,96px);font-weight:750;max-width:14ch}
+  .hero h1 em{font-style:normal;color:var(--saffron)}
+  .hero .sub{margin-top:28px;font-size:clamp(17px,2vw,21px);color:var(--on-blue-soft);max-width:52ch;line-height:1.55}
+  .hero .sub b{color:var(--on-blue);font-weight:600}
+  .hero-facts{
+    margin-top:clamp(40px,6vw,72px);display:flex;gap:clamp(24px,5vw,64px);flex-wrap:wrap;
+    border-top:1px solid oklch(1 0 0 / .18);padding-top:28px;
+  }
+  .hero-facts div{min-width:120px}
+  .hero-facts dt{font-size:13px;color:var(--on-blue-soft);font-weight:500;margin-bottom:4px}
+  .hero-facts dd{font-family:var(--display);font-size:clamp(20px,2.6vw,26px);font-weight:700}
+
+  /* ---------- SECTION SCAFFOLD ---------- */
+  section{padding:clamp(56px,8vw,104px) 0}
+  .kicker-num{font-family:var(--display);font-weight:800;font-size:15px;color:var(--blue);margin-bottom:10px}
+  .lede{font-size:clamp(17px,2vw,20px);color:var(--ink-soft);margin-top:16px}
+
+  /* ---------- CONCEPT ---------- */
+  .versus{
+    margin-top:clamp(36px,5vw,56px);
+    display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);
+    border-radius:22px;overflow:hidden;
+  }
+  .versus > div{padding:clamp(26px,4vw,40px)}
+  .versus .tuition{background:white}
+  .versus .skillgrowth{background:var(--blue);color:var(--on-blue)}
+  .versus h3{margin-bottom:18px}
+  .versus .skillgrowth h3{color:var(--saffron)}
+  .versus ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+  .versus li{display:flex;gap:12px;align-items:baseline;font-size:16px}
+  .versus .tuition li{color:var(--ink-soft)}
+  .versus .tuition li::before{content:"✕";color:oklch(0.6 0.02 260);font-weight:700;flex:none;font-size:13px}
+  .versus .skillgrowth li{color:var(--on-blue-soft)}
+  .versus .skillgrowth li::before{content:"✓";color:var(--saffron);font-weight:800;flex:none}
+  .versus .skillgrowth li b{color:var(--on-blue);font-weight:600}
+  .concept-line{
+    margin-top:clamp(32px,5vw,48px);
+    font-family:var(--display);font-weight:650;letter-spacing:-0.01em;
+    font-size:clamp(20px,2.8vw,27px);max-width:34ch;line-height:1.3;
+  }
+  .concept-line em{font-style:normal;color:var(--blue)}
+
+  /* ---------- ECOSYSTEM DIAGRAM ---------- */
+  .eco{background:var(--blue-deeper);color:var(--on-blue)}
+  .eco .kicker-num{color:var(--saffron)}
+  .eco h2{color:var(--on-blue)}
+  .eco .lede{color:var(--on-blue-soft)}
+  .tree{margin-top:clamp(40px,6vw,64px);display:flex;flex-direction:column;align-items:center}
+  .node{
+    background:oklch(1 0 0 / .07);border:1px solid oklch(1 0 0 / .22);
+    border-radius:14px;padding:14px 30px;text-align:center;
+    font-family:var(--display);font-weight:700;font-size:clamp(16px,2vw,19px);
+  }
+  .node small{display:block;font-family:var(--body);font-weight:500;font-size:13px;color:var(--on-blue-soft);margin-top:2px}
+  .node.root{background:var(--saffron);border-color:var(--saffron);color:var(--ink)}
+  .node.root small{color:oklch(0.4 0.05 70)}
+  .drop{width:1px;height:34px;background:oklch(1 0 0 / .35)}
+  .cat-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+    width:100%;max-width:920px;
+  }
+  .cat{
+    border:1px solid oklch(1 0 0 / .2);border-radius:16px;overflow:hidden;
+    background:oklch(1 0 0 / .05);
+  }
+  .cat header{
+    padding:12px 18px;font-family:var(--display);font-weight:750;font-size:16px;
+    background:oklch(1 0 0 / .1);border-bottom:1px solid oklch(1 0 0 / .18);
+    color:var(--saffron);
+  }
+  .cat ul{list-style:none;padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+  .cat li{font-size:14.5px;color:var(--on-blue-soft)}
+  .cat li.p1{
+    color:var(--ink);font-weight:700;background:var(--saffron);
+    border-radius:8px;padding:2px 10px;margin:0 -10px;display:inline-block;width:max-content;
+  }
+  .cat-legend{margin:18px 0 0;font-size:13.5px;color:var(--on-blue-soft)}
+  .cat-legend i{
+    display:inline-block;width:12px;height:12px;background:var(--saffron);border-radius:4px;
+    margin-right:8px;vertical-align:-1px;
+  }
+  .journey-strip{
+    margin-top:0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;
+    max-width:920px;
+  }
+  .journey-strip span{
+    border:1px solid oklch(1 0 0 / .25);border-radius:99px;padding:8px 18px;
+    font-size:14.5px;font-weight:600;color:var(--on-blue);
+    display:flex;align-items:center;gap:10px;
+  }
+  .journey-strip span:not(:last-child)::after{content:"→";color:var(--saffron);font-weight:800}
+
+  /* ---------- START ---------- */
+  .start{background:var(--blue-tint)}
+  .classes{
+    display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(28px,4vw,48px);
+    margin-top:clamp(32px,5vw,52px);align-items:stretch;
+  }
+  .class-slab{
+    background:white;border:1px solid var(--line);border-radius:22px;
+    padding:clamp(26px,3.5vw,38px);display:flex;flex-direction:column;gap:26px;
+  }
+  .class-row{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap}
+  .class-row .name{font-family:var(--display);font-weight:750;font-size:clamp(24px,3vw,32px);letter-spacing:-0.02em}
+  .class-row .why{color:var(--ink-soft);font-size:15.5px;flex:1;min-width:220px}
+  .class-note{font-size:15px;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:18px}
+  .room{
+    background:var(--blue-deep);color:var(--on-blue);border-radius:22px;
+    padding:clamp(26px,3.5vw,38px);display:flex;flex-direction:column;
+  }
+  .room h3{color:var(--on-blue)}
+  .seats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:22px 0 14px;max-width:260px}
+  .seat{aspect-ratio:1;border-radius:8px;background:oklch(1 0 0 / .14);border:1px solid oklch(1 0 0 / .2)}
+  .seat.on{background:var(--saffron);border-color:var(--saffron)}
+  .room p{font-size:15.5px;color:var(--on-blue-soft)}
+  .room .grow{margin-top:auto;padding-top:22px;border-top:1px solid oklch(1 0 0 / .18);font-size:15.5px;color:var(--on-blue)}
+  .room .grow b{color:var(--saffron)}
+
+  /* ---------- FLOWS (parent / teacher) ---------- */
+  .flow-rail{
+    margin-top:clamp(36px,5vw,52px);
+    display:flex;flex-wrap:wrap;gap:14px 8px;align-items:stretch;
+    counter-reset:fl;
+  }
+  .fstep{
+    counter-increment:fl;
+    background:white;border:1px solid var(--line);border-radius:16px;
+    padding:16px 18px;flex:1 1 150px;min-width:150px;max-width:220px;
+    position:relative;
+  }
+  .fstep::before{
+    content:counter(fl,decimal-leading-zero);
+    font-family:var(--display);font-weight:800;font-size:13px;color:var(--blue);
+    display:block;margin-bottom:6px;
+  }
+  .fstep b{font-family:var(--display);font-weight:700;font-size:15.5px;display:block;line-height:1.25}
+  .fstep span{font-size:13.5px;color:var(--ink-soft);display:block;margin-top:5px;line-height:1.45}
+  .fstep.hot{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+  .fstep.hot::before{color:var(--saffron)}
+  .fstep.hot span{color:var(--on-blue-soft)}
+  .flow-loop{
+    margin-top:20px;font-size:15px;color:var(--ink-soft);
+    display:flex;gap:10px;align-items:baseline;max-width:64ch;
+  }
+  .flow-loop::before{content:"↻";color:var(--saffron-deep);font-weight:800;font-size:18px;flex:none}
+  .teach-rail .fstep{background:var(--blue-tint);border-color:var(--blue-tint-2)}
+  .teach-rail .fstep.hot{background:var(--blue-deep);border-color:var(--blue-deep)}
+
+  /* ---------- MONEY ---------- */
+  .split-visual{margin-top:clamp(36px,5vw,56px)}
+  .split-total{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+  .split-total .amt{font-family:var(--display);font-weight:800;font-size:clamp(26px,3.5vw,36px)}
+  .split-total .lbl{color:var(--ink-soft);font-size:15px}
+  .bar{display:flex;border-radius:14px;overflow:hidden;height:72px}
+  .bar .teacher{flex:7;background:var(--blue);color:var(--on-blue);display:flex;flex-direction:column;justify-content:center;padding:0 22px}
+  .bar .us{flex:3;background:var(--saffron);color:var(--ink);display:flex;flex-direction:column;justify-content:center;padding:0 22px}
+  .bar b{font-family:var(--display);font-size:19px;font-weight:750}
+  .bar span{font-size:13px;opacity:.85}
+  .experiments{
+    margin-top:clamp(40px,6vw,56px);
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;
+  }
+  .experiments div{background:var(--paper);padding:22px 24px}
+  .experiments h4{font-family:var(--display);font-size:16px;font-weight:700;margin-bottom:6px}
+  .experiments p{font-size:14.5px;color:var(--ink-soft)}
+  .rule-note{margin-top:24px;font-size:15.5px;color:var(--ink-soft)}
+  .rule-note b{color:var(--ink)}
+  .streams{
+    margin-top:clamp(44px,6vw,64px);
+  }
+  .streams h3{margin-bottom:20px}
+  .stream-rows{display:flex;flex-direction:column;gap:10px}
+  .stream-row{
+    display:grid;grid-template-columns:minmax(110px,180px) 1fr;gap:clamp(16px,3vw,32px);
+    align-items:baseline;padding:14px 0;border-top:1px solid var(--line);
+  }
+  .stream-row:last-child{border-bottom:1px solid var(--line)}
+  .stream-row .when{font-family:var(--display);font-weight:750;font-size:15px;color:var(--blue)}
+  .stream-row .what{font-size:15.5px;color:var(--ink-soft)}
+  .stream-row .what b{color:var(--ink);font-weight:600}
+
+  /* ---------- MARKETING ---------- */
+  .mkt{background:var(--blue-tint)}
+  .funnel{margin-top:clamp(36px,5vw,56px);display:flex;flex-direction:column;gap:12px;align-items:center}
+  .fun-stage{
+    background:white;border:1px solid var(--line);border-radius:18px;
+    padding:clamp(20px,3vw,28px) clamp(22px,3.5vw,36px);
+    width:100%;
+  }
+  .fun-stage:nth-child(1){max-width:100%}
+  .fun-stage:nth-child(2){max-width:88%}
+  .fun-stage:nth-child(3){max-width:76%;background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+  .fun-stage:nth-child(4){max-width:64%;background:var(--saffron);border-color:var(--saffron)}
+  .fun-head{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+  .fun-head h3{font-size:clamp(17px,2vw,20px)}
+  .fun-stage:nth-child(3) h3{color:var(--on-blue)}
+  .fun-head .goal{font-size:13px;font-weight:700;color:var(--blue)}
+  .fun-stage:nth-child(3) .goal{color:var(--saffron)}
+  .fun-stage:nth-child(4) .goal{color:oklch(0.45 0.08 60)}
+  .fun-tags{display:flex;flex-wrap:wrap;gap:8px}
+  .fun-tags span{
+    font-size:13.5px;font-weight:600;border:1px solid var(--line);
+    border-radius:99px;padding:5px 14px;background:var(--paper);
+  }
+  .fun-stage:nth-child(3) .fun-tags span{background:oklch(1 0 0 / .12);border-color:oklch(1 0 0 / .25);color:var(--on-blue)}
+  .fun-stage:nth-child(4) .fun-tags span{background:oklch(1 0 0 / .45);border-color:oklch(0.6 0.1 70)}
+  .mkt-note{margin-top:26px;font-size:15.5px;color:var(--ink-soft);max-width:66ch}
+  .mkt-note b{color:var(--ink)}
+
+  /* ---------- COMPANY STRUCTURE ---------- */
+  .org-panels{
+    margin-top:clamp(36px,5vw,56px);
+    display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,40px);align-items:start;
+  }
+  .org{
+    border:1px solid var(--line);border-radius:22px;background:white;
+    padding:clamp(24px,3.5vw,34px);
+  }
+  .org.future{background:var(--blue-deep);border-color:var(--blue-deep);color:var(--on-blue)}
+  .org .phase-tag{
+    display:inline-block;font-size:12.5px;font-weight:700;letter-spacing:.04em;
+    border-radius:99px;padding:3px 14px;margin-bottom:16px;
+    background:var(--saffron);color:var(--ink);
+  }
+  .org h3{margin-bottom:20px}
+  .org.future h3{color:var(--on-blue)}
+  .org-tree{display:flex;flex-direction:column;align-items:center}
+  .org-node{
+    border:1px solid var(--line);border-radius:12px;padding:10px 20px;text-align:center;
+    font-family:var(--display);font-weight:700;font-size:15px;background:var(--blue-tint);
+  }
+  .org-node small{display:block;font-family:var(--body);font-weight:500;font-size:12.5px;color:var(--ink-soft)}
+  .org.future .org-node{background:oklch(1 0 0 / .08);border-color:oklch(1 0 0 / .22)}
+  .org.future .org-node small{color:var(--on-blue-soft)}
+  .org-node.top{background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+  .org-node.top small{color:var(--on-blue-soft)}
+  .org.future .org-node.top{background:var(--saffron);color:var(--ink);border-color:var(--saffron)}
+  .org.future .org-node.top small{color:oklch(0.4 0.05 70)}
+  .org-drop{width:1px;height:22px;background:var(--line)}
+  .org.future .org-drop{background:oklch(1 0 0 / .3)}
+  .org-branches{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+  .org-branches .org-node{font-size:13.5px;padding:10px 12px}
+  .org-note{margin-top:18px;font-size:14px;color:var(--ink-soft)}
+  .org.future .org-note{color:var(--on-blue-soft)}
+
+  /* ---------- ROADMAP ---------- */
+  .road{background:var(--blue-tint)}
+  .phases{margin-top:clamp(36px,5vw,56px);display:flex;flex-direction:column;gap:14px}
+  .phase{
+    display:grid;grid-template-columns:minmax(72px,96px) 1fr;gap:clamp(18px,3vw,36px);
+    background:white;border:1px solid var(--line);border-radius:18px;
+    padding:clamp(20px,3vw,28px) clamp(20px,3vw,32px);align-items:baseline;
+  }
+  .phase.now{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+  .phase .p-num{font-family:var(--display);font-weight:800;font-size:clamp(22px,3vw,30px);color:var(--blue)}
+  .phase.now .p-num{color:var(--saffron)}
+  .phase h3{margin-bottom:4px}
+  .phase.now h3{color:var(--on-blue)}
+  .phase p{font-size:15.5px;color:var(--ink-soft)}
+  .phase.now p{color:var(--on-blue-soft)}
+  .phase .tag{
+    display:inline-block;font-size:12.5px;font-weight:700;letter-spacing:.04em;
+    color:var(--ink);background:var(--saffron);border-radius:99px;
+    padding:2px 12px;margin-left:10px;vertical-align:middle;
+  }
+  .phase-later{
+    display:grid;grid-template-columns:minmax(72px,96px) 1fr;gap:clamp(18px,3vw,36px);
+    padding:14px clamp(20px,3vw,32px);align-items:baseline;
+  }
+  .phase-later .p-num{font-family:var(--display);font-weight:700;font-size:17px;color:var(--ink-soft)}
+  .phase-later p{font-size:15.5px;color:var(--ink-soft)}
+  .no-code{
+    margin-top:clamp(36px,5vw,52px);background:white;border:1px solid var(--line);
+    border-radius:18px;padding:clamp(22px,3vw,32px);
+  }
+  .no-code h3{color:var(--blue-deep);margin-bottom:8px}
+  .no-code p{font-size:16px;color:var(--ink-soft)}
+
+  /* ---------- 30 DAYS ---------- */
+  .plan{background:var(--blue-deeper);color:var(--on-blue)}
+  .plan .kicker-num{color:var(--saffron)}
+  .plan h2{color:var(--on-blue)}
+  .plan .lede{color:var(--on-blue-soft)}
+  .weeks{margin-top:clamp(40px,6vw,64px);display:flex;flex-direction:column}
+  .week{
+    display:grid;grid-template-columns:minmax(90px,140px) 1fr;gap:clamp(20px,4vw,48px);
+    padding:clamp(28px,4vw,40px) 0;border-top:1px solid oklch(1 0 0 / .16);
+  }
+  .week-num{font-family:var(--display);font-weight:800;font-size:clamp(40px,6vw,64px);line-height:.9;color:var(--saffron)}
+  .week-num small{display:block;font-size:13px;font-weight:600;color:var(--on-blue-soft);letter-spacing:.02em;margin-bottom:6px}
+  .week h3{color:var(--on-blue);margin-bottom:14px}
+  .week ul{list-style:none;display:flex;flex-direction:column;gap:9px;max-width:62ch}
+  .week li{display:flex;gap:12px;font-size:16px;color:var(--on-blue-soft);align-items:baseline}
+  .week li::before{content:"·";color:var(--saffron);font-weight:800;flex:none}
+  .week li b{color:var(--on-blue);font-weight:600}
+  .plan-close{
+    margin-top:clamp(32px,5vw,48px);padding-top:28px;border-top:1px solid oklch(1 0 0 / .16);
+    font-size:clamp(17px,2vw,20px);color:var(--on-blue);max-width:56ch;
+    font-family:var(--display);font-weight:600;letter-spacing:-0.01em;
+  }
+  .plan-close em{font-style:normal;color:var(--saffron)}
+
+  /* ---------- SCORECARD ---------- */
+  .score-list{margin-top:clamp(32px,5vw,52px);counter-reset:sc;list-style:none;border-top:1px solid var(--line)}
+  .score-list li{
+    counter-increment:sc;display:grid;grid-template-columns:56px 1fr auto;gap:18px;
+    align-items:baseline;padding:20px 0;border-bottom:1px solid var(--line);
+  }
+  .score-list li::before{
+    content:counter(sc,decimal-leading-zero);
+    font-family:var(--display);font-weight:800;color:var(--blue);font-size:18px;
+  }
+  .score-list .what{font-size:clamp(16px,2vw,18px);font-weight:600}
+  .score-list .target{
+    font-family:var(--display);font-weight:750;font-size:clamp(16px,2vw,19px);
+    color:var(--blue-deep);text-align:right;white-space:nowrap;
+  }
+  .fail-note{margin-top:26px;font-size:15.5px;color:var(--ink-soft);max-width:64ch}
+  .fail-note b{color:var(--saffron-deep)}
+
+  /* ---------- RISKS ---------- */
+  .risks-list{
+    margin-top:clamp(32px,5vw,48px);
+    display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,40px) clamp(32px,5vw,64px);
+  }
+  .risk h3{font-size:17px;margin-bottom:6px}
+  .risk p{font-size:15px;color:var(--ink-soft)}
+  .risk .own{display:inline-block;margin-top:8px;font-size:13px;font-weight:700;color:var(--blue)}
+
+  /* ---------- ASK ---------- */
+  .ask{background:var(--blue-deep);color:var(--on-blue)}
+  .ask h2{color:var(--on-blue);max-width:20ch}
+  .ask .lede{color:var(--on-blue-soft)}
+  .asks{margin-top:clamp(36px,5vw,52px);display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+  .asks div{border:1px solid oklch(1 0 0 / .2);border-radius:16px;padding:22px}
+  .asks b{font-family:var(--display);font-size:17px;font-weight:700;display:block;margin-bottom:6px;color:var(--saffron)}
+  .asks p{font-size:15px;color:var(--on-blue-soft)}
+  footer{padding:28px 0 40px;font-size:13.5px;color:var(--ink-soft)}
+  footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+  @media (max-width:820px){
+    .cat-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:760px){
+    .classes,.risks-list,.versus,.org-panels{grid-template-columns:1fr}
+    .score-list li{grid-template-columns:44px 1fr;grid-template-rows:auto auto}
+    .score-list .target{grid-column:2;text-align:left}
+    .week{grid-template-columns:1fr;gap:14px}
+    .fun-stage:nth-child(2),.fun-stage:nth-child(3),.fun-stage:nth-child(4){max-width:100%}
+    .fstep{max-width:none}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+    .reveal.in{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HERO ═══════════ -->
+<header class="hero">
+  <div class="wrap">
+    <div class="brandline">
+      <span class="wordmark">Skill<span class="nest">Nest</span></span>
+      <small>DSR Parkway pilot · Internal plan · July 2026</small>
+    </div>
+    <h1>Not tuition. <em>Skill growth,</em> downstairs.</h1>
+    <p class="sub">SkillNest turns our society into a community learning hub. We validate it here first: <b>20 paying students, 90 days, zero code,</b> using 700 flats of distribution we already live in.</p>
+    <dl class="hero-facts">
+      <div><dt>Where</dt><dd>DSR Parkway</dd></div>
+      <div><dt>Classes</dt><dd>2 to start</dd></div>
+      <div><dt>Teachers</dt><dd>Ready now</dd></div>
+      <div><dt>Software</dt><dd>None yet</dd></div>
+      <div><dt>Capital needed</dt><dd>~₹0</dd></div>
+    </dl>
+  </div>
+</header>
+
+<!-- ═══════════ 01 THE CONCEPT ═══════════ -->
+<section id="concept">
+  <div class="wrap">
+    <p class="kicker-num">01</p>
+    <h2>The concept</h2>
+    <p class="lede">Tuition centers sell marks. SkillNest builds children: confidence, expression, language, creativity, fitness, and life skills, all inside the community they live in.</p>
+
+    <div class="versus reveal">
+      <div class="tuition">
+        <h3>A tuition center</h3>
+        <ul>
+          <li>One subject, one goal: exam marks</li>
+          <li>Child travels to the teacher</li>
+          <li>Parent has no view of progress</li>
+          <li>Trust rests on one individual</li>
+          <li>Ends when the exam ends</li>
+        </ul>
+      </div>
+      <div class="skillgrowth">
+        <h3>SkillNest</h3>
+        <ul>
+          <li><b>Whole-child skill growth</b> across academics, creative, sports, and life skills</li>
+          <li>Classes <b>inside the society</b>, walking distance, zero commute</li>
+          <li><b>Visible progress:</b> reports, showcases, certificates</li>
+          <li>Trust rests on a <b>verified community brand</b></li>
+          <li>A <b>learning journey</b> from age 4 to 16, class after class</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="concept-line reveal">One child can start with Kannada at 5, add Public Speaking at 8, Chess at 10, Coding at 12. <em>That journey is the business.</em></p>
+  </div>
+</section>
+
+<!-- ═══════════ 02 THE ECOSYSTEM ═══════════ -->
+<section class="eco" id="ecosystem">
+  <div class="wrap">
+    <p class="kicker-num">02</p>
+    <h2>One platform, every skill</h2>
+    <p class="lede">The full shape of what we're building. Highlighted classes are where we start; everything else unlocks phase by phase.</p>
+
+    <div class="tree reveal">
+      <div class="node root">SkillNest<small>the trusted community learning brand</small></div>
+      <div class="drop"></div>
+      <div class="node">Community Learning Platform<small>discovery, booking, payments, progress</small></div>
+      <div class="drop"></div>
+      <div class="node">Society Learning Center<small>physical hub in every society · DSR Parkway is #1</small></div>
+      <div class="drop"></div>
+      <div class="cat-grid">
+        <div class="cat">
+          <header>Academics</header>
+          <ul>
+            <li class="p1">Kannada</li>
+            <li>Maths</li>
+            <li>English</li>
+            <li>Science</li>
+          </ul>
+        </div>
+        <div class="cat">
+          <header>Creative</header>
+          <ul>
+            <li>Music</li>
+            <li>Dance</li>
+            <li>Art</li>
+            <li>Drawing</li>
+          </ul>
+        </div>
+        <div class="cat">
+          <header>Sports</header>
+          <ul>
+            <li>Cricket</li>
+            <li>Football</li>
+            <li>Karate</li>
+            <li>Yoga</li>
+          </ul>
+        </div>
+        <div class="cat">
+          <header>Life Skills</header>
+          <ul>
+            <li class="p1">Public Speaking</li>
+            <li>Coding</li>
+            <li>Robotics</li>
+            <li>Financial Literacy</li>
+          </ul>
+        </div>
+      </div>
+      <p class="cat-legend"><i></i>Phase 1 launch classes · everything else follows demand</p>
+      <div class="drop"></div>
+      <div class="node">Parent Mobile App<small>later: today this is WhatsApp + Google Forms</small></div>
+      <div class="drop"></div>
+      <div class="journey-strip">
+        <span>Discover</span><span>Book</span><span>Pay</span><span>Track</span><span>Certificates</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 03 WHAT WE START WITH ═══════════ -->
+<section class="start" id="start">
+  <div class="wrap">
+    <p class="kicker-num">03</p>
+    <h2>What we start with</h2>
+    <p class="lede">Two classes chosen to build trust, not maximize revenue. Both teachers are identified and ready to begin.</p>
+    <div class="classes">
+      <div class="class-slab reveal">
+        <div class="class-row">
+          <span class="name">Public Speaking</span>
+          <span class="why">High parent aspiration, visible progress within weeks, kids can perform at society events.</span>
+        </div>
+        <div class="class-row">
+          <span class="name">Kannada</span>
+          <span class="why">Real need for non-Kannadiga families, school-syllabus adjacent, strong word of mouth potential.</span>
+        </div>
+        <p class="class-note">Ages 4 to 16, residents only. Two batches per class: one weekday evening, one weekend. Free demo class for every child before enrollment.</p>
+      </div>
+      <div class="room reveal">
+        <h3>The classroom</h3>
+        <div class="seats" aria-label="10 seats, shown as filled">
+          <div class="seat on"></div><div class="seat on"></div><div class="seat on"></div><div class="seat on"></div><div class="seat on"></div>
+          <div class="seat on"></div><div class="seat on"></div><div class="seat on"></div><div class="seat on"></div><div class="seat on"></div>
+        </div>
+        <p>One room at home. 10 seats per batch. Small enough to feel personal, big enough to prove demand.</p>
+        <p class="grow">When batches fill past capacity, we add batches first, then move to the <b>clubhouse classroom</b>. Space scales only after demand forces it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 04 PARENT FLOW ═══════════ -->
+<section id="parents">
+  <div class="wrap">
+    <p class="kicker-num">04</p>
+    <h2>The parent journey</h2>
+    <p class="lede">From first WhatsApp message to a long-term learning relationship. Steps in blue are where money changes hands.</p>
+    <div class="flow-rail reveal">
+      <div class="fstep"><b>Discover</b><span>Society WhatsApp group, poster in the lift, a neighbour's word</span></div>
+      <div class="fstep"><b>Book free demo</b><span>Google Form, 30 seconds, no commitment</span></div>
+      <div class="fstep"><b>Child attends trial</b><span>Parent sees the teacher, the room, the vibe</span></div>
+      <div class="fstep hot"><b>Enroll & pay</b><span>On the spot, first month via UPI</span></div>
+      <div class="fstep"><b>Attend classes</b><span>Walk downstairs; attendance tracked</span></div>
+      <div class="fstep"><b>Weekly updates</b><span>Photos + what was covered, on WhatsApp</span></div>
+      <div class="fstep"><b>Monthly report</b><span>Visible progress, per child</span></div>
+      <div class="fstep hot"><b>Renew & refer</b><span>Certificate, showcase event, next class recommended</span></div>
+    </div>
+    <p class="flow-loop">The last step feeds the first: every certificate ceremony and society showcase creates the next batch of demo bookings. Retention and referral are the growth engine, not ads.</p>
+  </div>
+</section>
+
+<!-- ═══════════ 05 TEACHER FLOW ═══════════ -->
+<section class="start" id="teachers">
+  <div class="wrap">
+    <p class="kicker-num">05</p>
+    <h2>The teacher journey</h2>
+    <p class="lede">Teachers do the one thing they love. SkillNest does everything else. That is why the commission is earned, not charged.</p>
+    <div class="flow-rail teach-rail reveal">
+      <div class="fstep"><b>Apply / sourced</b><span>Referrals and local networks first</span></div>
+      <div class="fstep"><b>Interview</b><span>Skill + attitude with kids</span></div>
+      <div class="fstep"><b>Verification</b><span>Background check, references. Non-negotiable</span></div>
+      <div class="fstep"><b>Demo session</b><span>We watch them teach before parents do</span></div>
+      <div class="fstep hot"><b>Agreement</b><span>One page: split %, schedule, cancellation terms</span></div>
+      <div class="fstep"><b>Onboarding</b><span>Batch timings, class norms, safety rules</span></div>
+      <div class="fstep"><b>Teach</b><span>Students, room, and materials all arranged</span></div>
+      <div class="fstep hot"><b>Monthly settlement</b><span>Transparent payout, on time, every time</span></div>
+    </div>
+    <p class="flow-loop">A teacher who earns well without doing any marketing becomes our best recruiter of other teachers. Phase 2 classes get staffed through this loop.</p>
+  </div>
+</section>
+
+<!-- ═══════════ 06 REVENUE MODEL ═══════════ -->
+<section id="money">
+  <div class="wrap">
+    <p class="kicker-num">06</p>
+    <h2>The revenue model</h2>
+    <p class="lede">Marketplace economics: teachers earn most of the fee, SkillNest earns a commission for running everything around the teaching.</p>
+
+    <div class="split-visual reveal">
+      <div class="split-total">
+        <span class="amt">₹50,000<span style="font-size:.5em;font-weight:600;color:var(--ink-soft)"> /month</span></span>
+        <span class="lbl">Illustration: 20 students × ₹2,500. Numbers below are hypotheses, not decisions.</span>
+      </div>
+      <div class="bar" role="img" aria-label="Fee split: teacher 70 percent, SkillNest 30 percent">
+        <div class="teacher"><b>₹35,000 · Teacher</b><span>70% for teaching</span></div>
+        <div class="us"><b>₹15,000 · SkillNest</b><span>30% for everything else</span></div>
+      </div>
+    </div>
+
+    <div class="experiments reveal">
+      <div>
+        <h4>Price point</h4>
+        <p>Test ₹1,500 / ₹2,000 / ₹2,500 anchors in demo-day conversations. Let parents tell us.</p>
+      </div>
+      <div>
+        <h4>Teacher split</h4>
+        <p>Start at 70/30. Zero acquisition cost for teachers may support 60/40.</p>
+      </div>
+      <div>
+        <h4>Payment cadence</h4>
+        <p>Monthly vs quarterly. Quarterly with a small discount improves retention and cash flow.</p>
+      </div>
+      <div>
+        <h4>Discounts</h4>
+        <p>Sibling and multi-class appetite: measure it before offering it.</p>
+      </div>
+    </div>
+    <p class="rule-note"><b>Decision rule:</b> pricing gets locked only after 20 paying enrollments and one full renewal cycle. Until then nothing is hardcoded, anywhere.</p>
+
+    <div class="streams reveal">
+      <h3>How revenue compounds later</h3>
+      <div class="stream-rows">
+        <div class="stream-row"><span class="when">Phase 1–2</span><span class="what"><b>Class commissions</b> · the core engine: monthly subscriptions across a growing class catalog</span></div>
+        <div class="stream-row"><span class="when">Phase 2–3</span><span class="what"><b>Camps & workshops</b> · summer camps, holiday workshops, birthday workshops: high-margin bursts on existing trust</span></div>
+        <div class="stream-row"><span class="when">Phase 3–4</span><span class="what"><b>Events & competitions</b> · inter-society competitions, showcases, leaderboards: engagement that markets itself</span></div>
+        <div class="stream-row"><span class="when">Phase 4+</span><span class="what"><b>Kits & merchandise</b> · learning kits, books, uniforms, merchandise attached to every enrollment</span></div>
+        <div class="stream-row"><span class="when">Phase 5+</span><span class="what"><b>Platform & franchise</b> · teacher marketplace fees, society dashboards, franchise licensing</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 07 MARKETING ═══════════ -->
+<section class="mkt" id="marketing">
+  <div class="wrap">
+    <p class="kicker-num">07</p>
+    <h2>Marketing strategy</h2>
+    <p class="lede">Zero ad budget. The society itself is the channel, and trust is the currency. Four stages, each feeding the next.</p>
+
+    <div class="funnel reveal">
+      <div class="fun-stage">
+        <div class="fun-head"><h3>Awareness · the whole society knows</h3><span class="goal">GOAL: 700 flats hear of us</span></div>
+        <div class="fun-tags">
+          <span>RWA blessing first</span><span>Society WhatsApp groups</span><span>Posters: lobby, lift, clubhouse</span><span>Notice board</span>
+        </div>
+      </div>
+      <div class="fun-stage">
+        <div class="fun-head"><h3>Consideration · parents get curious</h3><span class="goal">GOAL: demo bookings</span></div>
+        <div class="fun-tags">
+          <span>20 personal parent conversations</span><span>Teacher intro on WhatsApp</span><span>Free demo class offer</span><span>Neighbour word of mouth</span>
+        </div>
+      </div>
+      <div class="fun-stage">
+        <div class="fun-head"><h3>Conversion · demo day closes</h3><span class="goal">GOAL: 20 enrollments</span></div>
+        <div class="fun-tags">
+          <span>Demo days, 10 kids per slot</span><span>Enroll on the spot</span><span>UPI, first month paid</span><span>Founding-batch framing</span>
+        </div>
+      </div>
+      <div class="fun-stage">
+        <div class="fun-head"><h3>Retention & referral · the flywheel</h3><span class="goal">GOAL: renewals + referrals</span></div>
+        <div class="fun-tags">
+          <span>Weekly photo updates</span><span>Monthly progress reports</span><span>Certificates & showcases</span><span>Referral asks</span>
+        </div>
+      </div>
+    </div>
+    <p class="mkt-note"><b>Why this beats ads:</b> a parent trusts another parent in the same tower more than any creative we could buy. Every rupee not spent on marketing is a rupee we don't need to raise.</p>
+  </div>
+</section>
+
+<!-- ═══════════ 08 COMPANY STRUCTURE ═══════════ -->
+<section id="company">
+  <div class="wrap">
+    <p class="kicker-num">08</p>
+    <h2>Company structure</h2>
+    <p class="lede">Lean now, layered later. Roles exist from day one even when one person wears several hats.</p>
+
+    <div class="org-panels">
+      <div class="org reveal">
+        <span class="phase-tag">TODAY · PHASE 1</span>
+        <h3>Founding team, side project</h3>
+        <div class="org-tree">
+          <div class="org-node top">Founder<small>vision, RWA relationship, final calls</small></div>
+          <div class="org-drop"></div>
+          <div class="org-branches">
+            <div class="org-node">Teacher Ops<small>agreements, schedules, payouts</small></div>
+            <div class="org-node">Parent Outreach<small>WhatsApp, demos, enrollments</small></div>
+            <div class="org-node">Class Ops<small>attendance, room, materials</small></div>
+            <div class="org-node">Finance & Compliance<small>fees, entity, consent forms</small></div>
+          </div>
+        </div>
+        <p class="org-note">Each cofounder owns one workstream by name. Evenings and weekends only; total ops budget ≤10 hrs/week per person. Legal entity (proprietorship or LLP) registered during Phase 1, before fees become meaningful.</p>
+      </div>
+
+      <div class="org future reveal">
+        <span class="phase-tag">AT SCALE · PHASE 3+</span>
+        <h3>Operating company</h3>
+        <div class="org-tree">
+          <div class="org-node top">Founders / Leadership<small>strategy, expansion, partnerships</small></div>
+          <div class="org-drop"></div>
+          <div class="org-branches">
+            <div class="org-node">Society Ops Managers<small>one per society cluster</small></div>
+            <div class="org-node">Teacher Network<small>recruiting, training, quality</small></div>
+            <div class="org-node">Product & Tech<small>app, portals, payments</small></div>
+            <div class="org-node">Growth & Support<small>new societies, parent success</small></div>
+          </div>
+        </div>
+        <p class="org-note">The Phase 1 playbook we write by hand becomes the training manual for every ops manager we hire. Doing it manually first is how we learn what to systematize.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 09 PHASES ═══════════ -->
+<section class="road" id="roadmap">
+  <div class="wrap">
+    <p class="kicker-num">09</p>
+    <h2>The phases</h2>
+    <p class="lede">From one room to a national network. Each phase unlocks only when the previous one earns it.</p>
+
+    <div class="phases">
+      <div class="phase now reveal">
+        <span class="p-num">P1</span>
+        <div>
+          <h3>Validate in DSR Parkway <span class="tag">WE ARE HERE</span></h3>
+          <p>20 paying students · Public Speaking + Kannada · room at home, capacity 10 · WhatsApp + Forms + Sheets, zero software.</p>
+        </div>
+      </div>
+      <div class="phase reveal">
+        <span class="p-num">P2</span>
+        <div>
+          <h3>Grow inside the society</h3>
+          <p>100 students · 10 classes (Drawing, Art, Chess, Handwriting join) · move into the clubhouse classroom · parent referral engine.</p>
+        </div>
+      </div>
+      <div class="phase reveal">
+        <span class="p-num">P3</span>
+        <div>
+          <h3>Nearby societies</h3>
+          <p>Replicate with an operations playbook · first operations manager hire · Dance, Music, Yoga, Karate.</p>
+        </div>
+      </div>
+      <div class="phase reveal">
+        <span class="p-num">P4</span>
+        <div>
+          <h3>Platform</h3>
+          <p>Mobile app · teacher marketplace · society dashboard · Coding, Robotics, AI for Kids, Financial Literacy.</p>
+        </div>
+      </div>
+      <div class="phase-later reveal">
+        <span class="p-num">P5–P7</span>
+        <p>Multi-city expansion → franchise model → national brand. Every apartment society in India has a SkillNest.</p>
+      </div>
+    </div>
+
+    <div class="no-code reveal">
+      <h3>Where software fits</h3>
+      <p>Only after 20 paying students: a one-page site for credibility, then branding, then admissions flow, then portals. <strong>Rule: no portal gets built until the manual version of that workflow hurts.</strong> Building software before customers is the classic failure mode, and we are choosing not to fail that way.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 10 THE 30-DAY PLAN ═══════════ -->
+<section class="plan" id="plan">
+  <div class="wrap">
+    <p class="kicker-num">10</p>
+    <h2>The first 30 days</h2>
+    <p class="lede">Everything below needs WhatsApp, Google Forms, a UPI QR code, and evenings. Nothing needs a developer.</p>
+
+    <div class="weeks">
+      <div class="week reveal">
+        <div class="week-num"><small>WEEK</small>1</div>
+        <div>
+          <h3>Set up</h3>
+          <ul>
+            <li><b>Teacher agreements signed:</b> split %, schedule, cancellation terms, one page each</li>
+            <li>Batch timings fixed: 2 per class, weekday evening + weekend</li>
+            <li>WhatsApp Business account for SkillNest</li>
+            <li>Google Form for demo bookings, UPI for payments</li>
+            <li>One poster + one WhatsApp creative (Canva)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="week reveal">
+        <div class="week-num"><small>WEEK</small>2</div>
+        <div>
+          <h3>Make noise</h3>
+          <ul>
+            <li><b>RWA blessing first.</b> The single highest-leverage relationship in this plan</li>
+            <li>Post in society WhatsApp groups</li>
+            <li>Posters in lobbies, lifts, clubhouse notice board</li>
+            <li>Talk to 20 parents personally; write down objections verbatim</li>
+          </ul>
+        </div>
+      </div>
+      <div class="week reveal">
+        <div class="week-num"><small>WEEK</small>3</div>
+        <div>
+          <h3>Demo days</h3>
+          <ul>
+            <li>Free demo sessions for both classes, max 10 kids per slot</li>
+            <li>Collect enrollment intent and pricing preference on the spot</li>
+            <li><b>Enroll on the spot</b> with first-month payment via UPI</li>
+          </ul>
+        </div>
+      </div>
+      <div class="week reveal">
+        <div class="week-num"><small>WEEK</small>4</div>
+        <div>
+          <h3>Classes begin</h3>
+          <ul>
+            <li>First paid batches start</li>
+            <li>Attendance + fees in one Google Sheet</li>
+            <li><b>Weekly parent update on WhatsApp</b> with photos and what was covered. At this stage, this IS the product</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p class="plan-close">Total build cost of this plan: roughly <em>zero rupees</em> and our evenings. The society is the distribution channel, and we already live in it.</p>
+  </div>
+</section>
+
+<!-- ═══════════ 11 SCORECARD ═══════════ -->
+<section id="score">
+  <div class="wrap">
+    <p class="kicker-num">11</p>
+    <h2>How we'll know it worked</h2>
+    <p class="lede">Phase 1 passes only when all five are true, within about 90 days.</p>
+    <ol class="score-list reveal">
+      <li><span class="what">Paying students across the two classes</span><span class="target">20</span></li>
+      <li><span class="what">Month-2 renewal rate</span><span class="target">≥ 70%</span></li>
+      <li><span class="what">Unprompted parent referrals</span><span class="target">≥ 3</span></li>
+      <li><span class="what">Both teachers want to continue on the agreed split</span><span class="target">Yes</span></li>
+      <li><span class="what">Founder ops time per week</span><span class="target">≤ 10 hrs</span></li>
+    </ol>
+    <p class="fail-note"><b>If we miss:</b> we revisit pricing, class selection, or the model itself before writing a single line of software. Missing the target is cheap now. It gets expensive the moment we build.</p>
+  </div>
+</section>
+
+<!-- ═══════════ 12 RISKS ═══════════ -->
+<section class="mkt" id="risks">
+  <div class="wrap">
+    <p class="kicker-num">12</p>
+    <h2>Eyes open</h2>
+    <p class="lede">Known risks, and what we do about each one now.</p>
+    <div class="risks-list reveal">
+      <div class="risk">
+        <h3>Child safety</h3>
+        <p>Parent consent forms, teacher background verification, never unsupervised 1:1 sessions.</p>
+        <span class="own">Non-negotiable from day one</span>
+      </div>
+      <div class="risk">
+        <h3>Society bylaws</h3>
+        <p>Confirm classes from a flat are permitted; get RWA sign-off in writing before week 2.</p>
+        <span class="own">Before launch</span>
+      </div>
+      <div class="risk">
+        <h3>Legal entity & tax</h3>
+        <p>Register a proprietorship or LLP before fees become meaningful; GST applies past ₹20L turnover. Needs professional advice.</p>
+        <span class="own">During Phase 1</span>
+      </div>
+      <div class="risk">
+        <h3>Founder bandwidth</h3>
+        <p>Side project alongside a day job; check employer moonlighting policy. Ops must fit evenings and weekends.</p>
+        <span class="own">Resolve now</span>
+      </div>
+      <div class="risk">
+        <h3>Key-person teachers</h3>
+        <p>Both teachers are single points of failure. Keep a warm backup pipeline from day one.</p>
+        <span class="own">Ongoing</span>
+      </div>
+      <div class="risk">
+        <h3>Clubhouse access</h3>
+        <p>Terms, cost, and insurance are unknown. Resolve with the RWA before Phase 2 depends on it.</p>
+        <span class="own">Before Phase 2</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 13 ASK ═══════════ -->
+<section class="ask" id="ask">
+  <div class="wrap">
+    <p class="kicker-num" style="color:var(--saffron)">13</p>
+    <h2>What we need from each other</h2>
+    <p class="lede">This phase runs on hustle, not money. Four things decide whether we hit 20.</p>
+    <div class="asks reveal">
+      <div><b>Own a workstream</b><p>Teacher ops, parent outreach, class ops, or finance & compliance. One name per stream.</p></div>
+      <div><b>Work the network</b><p>Every cofounder personally talks to parents in their tower. Objections are data.</p></div>
+      <div><b>Hold the line on scope</b><p>No software, no new classes, no second society until the scorecard says pass.</p></div>
+      <div><b>Weekly 30-minute sync</b><p>Enrollments, objections, teacher health, cash collected. Numbers, then decisions.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span><strong>SkillNest</strong> · DSR Parkway pilot plan · confidential, internal</span>
+    <span>Prices and splits are open experiments until Phase 1 exit criteria are met.</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries)=>{
+    for(const e of entries){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
